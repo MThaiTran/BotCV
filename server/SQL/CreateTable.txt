@@ -80,3 +80,5 @@ CREATE TABLE CV (
     SeekerProfileID INT NOT NULL,
     FOREIGN KEY (SeekerProfileID ) REFERENCES SeekerProfile(ID)
 );
+
+--tmp update test
