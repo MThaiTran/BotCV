@@ -208,8 +208,8 @@ export const jobService = {
   // Tìm kiếm công việc
   searchJobs: async (filters) => {
     try {
-      const response = await axios.get(`${API_URL}/job`, { params: filters });
-      return response.data;
+      const response = await axios.get(`${API_URL}/job`);
+      return response.data.data;
     } catch (error) {
       console.error('Lỗi khi tìm kiếm công việc:', error);
       throw error;

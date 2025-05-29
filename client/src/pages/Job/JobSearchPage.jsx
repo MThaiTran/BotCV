@@ -21,6 +21,7 @@ const JobSearchPage = () => {
       try {
         const data = await jobService.searchJobs(filters);
         setJobs(data);
+        console.log(data);
       } catch (error) {
         console.error('Error fetching jobs:', error);
       } finally {
