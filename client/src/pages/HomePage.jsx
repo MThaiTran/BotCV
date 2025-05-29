@@ -46,7 +46,7 @@ const HomePage = () => {
             </div>
           </div>
           <div className="hero__image">
-            <img src="/src/assets/images/hero-image.png" alt="BotCV Hero" />
+            <img src="../../public/img/goc1.jpg" alt="BotCV Hero" />
           </div>
         </div>
       </section>

@@ -76,7 +76,6 @@ export const router = createBrowserRouter([
         )
       },
       {
-        path: '/admin/',
         path: '/admin/users',
         element: (      
             <AdminUserManagementPage />
