@@ -16,6 +16,12 @@ CREATE TABLE SeekerProfile (
     FOREIGN KEY (UserAccountID) REFERENCES UserAccount(ID)
 );
 
+CREATE TABLE JobCategory (
+    ID INTEGER IDENTITY(1,1) PRIMARY KEY,
+    categoryName VARCHAR(255) NOT NULL,
+    description VARCHAR(255) NOT NULL
+);
+
 CREATE TABLE Company (
     ID INTEGER IDENTITY(1,1) PRIMARY KEY,
     name VARCHAR(255) NOT NULL,
@@ -39,7 +45,9 @@ CREATE TABLE Job (
     jobFromWork VARCHAR(255),
     jobHireNumber VARCHAR(255),
     CompanyID INTEGER NOT NULL,
-    FOREIGN KEY (CompanyID) REFERENCES Company(ID)
+    JobCategoryID INTEGER NOT NULL,
+    FOREIGN KEY (CompanyID) REFERENCES Company(ID),
+    FOREIGN KEY (JobCategoryID) REFERENCES JobCategory(ID)
 );
 
 CREATE TABLE JobLocation (
@@ -49,11 +57,7 @@ CREATE TABLE JobLocation (
     FOREIGN KEY (JobID) REFERENCES Job(ID)
 );
 
-CREATE TABLE JobCategory (
-    ID INTEGER IDENTITY(1,1) PRIMARY KEY,
-    categoryName VARCHAR(255) NOT NULL,
-    description VARCHAR(255) NOT NULL
-);
+
 
 CREATE TABLE AppliedJob (
     ID INTEGER IDENTITY(1,1) PRIMARY KEY,

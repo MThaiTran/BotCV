@@ -35,12 +35,12 @@ INSERT INTO JobCategory (categoryName, description) VALUES
 ('Nhân sự', 'Công việc nhân sự và tuyển dụng');
 
 -- Chèn dữ liệu mẫu vào bảng Job
-INSERT INTO Job (name, jobExperience, salaryRange, expirationDate, jobDescription, jobLevel, jobEducation, jobFromWork, jobHireNumber, CompanyID) VALUES
-('Kỹ sư phần mềm', '3-5 năm', '20-30 triệu/tháng', '2025-12-31', 'Phát triển và bảo trì ứng dụng web.', 'Trung cấp', 'Cử nhân Công nghệ Thông tin', 'Từ xa', '2', 1),
-('Quản lý tiếp thị', 'Trên 5 năm', '25-35 triệu/tháng', '2025-11-30', 'Dẫn dắt các chiến dịch tiếp thị.', 'Cao cấp', 'Cử nhân Tiếp thị', 'Tại văn phòng', '1', 2),
-('Chuyên viên phân tích tài chính', '2-4 năm', '15-25 triệu/tháng', '2025-10-31', 'Phân tích dữ liệu tài chính.', 'Trung cấp', 'Cử nhân Tài chính', 'Kết hợp', '3', 3),
-('Nhà thiết kế đồ họa', '1-3 năm', '12-20 triệu/tháng', '2025-09-30', 'Tạo nội dung hình ảnh.', 'Sơ cấp', 'Cử nhân Thiết kế', 'Từ xa', '2', 4),
-('Chuyên viên nhân sự', '3-5 năm', '15-22 triệu/tháng', '2025-08-31', 'Quản lý quy trình tuyển dụng.', 'Trung cấp', 'Cử nhân Nhân sự', 'Tại văn phòng', '1', 1);
+INSERT INTO Job (name, jobExperience, salaryRange, expirationDate, jobDescription, jobLevel, jobEducation, jobFromWork, jobHireNumber, CompanyID, JobCategoryID) VALUES
+('Kỹ sư phần mềm', '3-5 năm', '20-30 triệu/tháng', '2025-12-31', 'Phát triển và bảo trì ứng dụng web.', 'Trung cấp', 'Cử nhân Công nghệ Thông tin', 'Từ xa', '2', 1, 1),
+('Quản lý tiếp thị', 'Trên 5 năm', '25-35 triệu/tháng', '2025-11-30', 'Dẫn dắt các chiến dịch tiếp thị.', 'Cao cấp', 'Cử nhân Tiếp thị', 'Tại văn phòng', '1', 2, 2),
+('Chuyên viên phân tích tài chính', '2-4 năm', '15-25 triệu/tháng', '2025-10-31', 'Phân tích dữ liệu tài chính.', 'Trung cấp', 'Cử nhân Tài chính', 'Kết hợp', '3', 3, 3),
+('Nhà thiết kế đồ họa', '1-3 năm', '12-20 triệu/tháng', '2025-09-30', 'Tạo nội dung hình ảnh.', 'Sơ cấp', 'Cử nhân Thiết kế', 'Từ xa', '2', 4, 4),
+('Chuyên viên nhân sự', '3-5 năm', '15-22 triệu/tháng', '2025-08-31', 'Quản lý quy trình tuyển dụng.', 'Trung cấp', 'Cử nhân Nhân sự', 'Tại văn phòng', '1', 1, 5);
 
 -- Chèn dữ liệu mẫu vào bảng JobLocation
 INSERT INTO JobLocation (location, JobID) VALUES

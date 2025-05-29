@@ -30,10 +30,12 @@ const JobDetailPage = () => {
   return (
     <div className="job-detail-container">
       <div className="job-header">
-        <h1>{job.title}</h1>
+        <h1>{job.name}</h1>
         <div className="company-info">
-          <img src={job.company.logo} alt={job.company.name} />
-          <h2>{job.company.name}</h2>
+          {/* <img src="" alt={job.company.name} /> */}
+          <img src="" alt="" />
+          {/* <h2>{job.company.name || "NULL"}</h2> */}
+          <h2>NULL</h2>
         </div>
       </div>
 
@@ -42,34 +44,29 @@ const JobDetailPage = () => {
           <div className="meta-item">
             <span className="label">Mức lương:</span>
             <span className="value">
-              {new Intl.NumberFormat('vi-VN', {
-                style: 'currency',
-                currency: 'VND'
-              }).format(job.salary.min)} - 
-              {new Intl.NumberFormat('vi-VN', {
-                style: 'currency',
-                currency: 'VND'
-              }).format(job.salary.max)}
+              {job.salaryRange}
             </span>
           </div>
           
           <div className="meta-item">
             <span className="label">Địa điểm:</span>
-            <span className="value">{job.location}</span>
+            {/* <span className="value">{job.location}</span> */}
+            <span className="value">NULL</span>
           </div>
         </div>
 
         <div className="job-section">
           <h2>Mô tả công việc</h2>
-          <div dangerouslySetInnerHTML={{ __html: job.description }} />
+          <div dangerouslySetInnerHTML={{ __html: job.jobDescription }} />
         </div>
 
         <div className="job-section">
           <h2>Yêu cầu</h2>
           <ul>
-            {job.requirements.map((req, index) => (
-              <li key={index}>{req}</li>
-            ))}
+            <li>{job.jobLevel}</li>
+            <li>{job.jobEducation}</li>
+            <li>{job.jobFromWork}</li>
+            <li>{job.jobHireNumber}</li>
           </ul>
         </div>
 
