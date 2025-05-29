@@ -1,0 +1,75 @@
+-- Chèn dữ liệu mẫu vào bảng UserAccount
+INSERT INTO UserAccount (email, password, profileImage, userType, registrationDate) VALUES
+('nguyen.van.an@example.com', 'matkhau123', 'an.jpg', 'Seeker', '2025-01-01'),
+('tran.thi.bich@example.com', 'matkhau456', 'bich.jpg', 'Seeker', '2025-02-01'),
+('congty.acme@example.com', 'matkhau789', 'acme.jpg', 'Company', '2025-03-01'),
+('congty.tech@example.com', 'matkhau101', 'tech.jpg', 'Company', '2025-04-01'),
+('quan.tri@example.com', 'admin123', NULL, 'Admin', '2025-05-01'),
+('le.thi.mai@example.com', 'matkhau202', 'mai.jpg', 'Seeker', '2025-01-15'),
+('pham.van.hung@example.com', 'matkhau303', 'hung.jpg', 'Seeker', '2025-02-15'),
+('congty.toan.cau@example.com', 'matkhau404', 'toancau.jpg', 'Company', '2025-03-15'),
+('ngo.thi.lan@example.com', 'matkhau505', 'lan.jpg', 'Seeker', '2025-04-15'),
+('congty.tuong.lai@example.com', 'matkhau606', 'tuonglai.jpg', 'Company', '2025-05-15');
+
+-- Chèn dữ liệu mẫu vào bảng SeekerProfile
+INSERT INTO SeekerProfile (fullName, phoneNumber, emailContact, UserAccountID) VALUES
+('Nguyễn Văn An', '0123456789', 'nguyen.van.an@example.com', 1),
+('Trần Thị Bích', '0987654321', 'tran.thi.bich@example.com', 2),
+('Lê Thị Mai', '0555123456', 'le.thi.mai@example.com', 6),
+('Phạm Văn Hùng', '0444987654', 'pham.van.hung@example.com', 7),
+('Ngô Thị Lan', '0333456789', 'ngo.thi.lan@example.com', 9);
+
+-- Chèn dữ liệu mẫu vào bảng Company
+INSERT INTO Company (name, description, establishmentDate, companyWebsite, companyEmail, UserAccountID) VALUES
+('Công ty Acme', 'Công ty công nghệ hàng đầu', '2010-01-01', 'www.acme.vn', 'congty.acme@example.com', 3),
+('Công ty Tech', 'Nhà cung cấp giải pháp sáng tạo', '2015-06-01', 'www.tech.vn', 'congty.tech@example.com', 4),
+('Công ty Toàn Cầu', 'Giải pháp kinh doanh toàn cầu', '2005-03-01', 'www.toancau.vn', 'congty.toan.cau@example.com', 8),
+('Công ty Tương Lai', 'Công nghệ tiên tiến', '2020-07-01', 'www.tuonglai.vn', 'congty.tuong.lai@example.com', 10);
+
+-- Chèn dữ liệu mẫu vào bảng JobCategory
+INSERT INTO JobCategory (categoryName, description) VALUES
+('Phát triển phần mềm', 'Công việc liên quan đến kỹ thuật phần mềm'),
+('Tiếp thị', 'Công việc trong lĩnh vực tiếp thị và bán hàng'),
+('Tài chính', 'Công việc tài chính và kế toán'),
+('Thiết kế', 'Vai trò thiết kế sáng tạo'),
+('Nhân sự', 'Công việc nhân sự và tuyển dụng');
+
+-- Chèn dữ liệu mẫu vào bảng Job
+INSERT INTO Job (name, jobExperience, salaryRange, expirationDate, jobDescription, jobLevel, jobEducation, jobFromWork, jobHireNumber, CompanyID) VALUES
+('Kỹ sư phần mềm', '3-5 năm', '20-30 triệu/tháng', '2025-12-31', 'Phát triển và bảo trì ứng dụng web.', 'Trung cấp', 'Cử nhân Công nghệ Thông tin', 'Từ xa', '2', 1),
+('Quản lý tiếp thị', 'Trên 5 năm', '25-35 triệu/tháng', '2025-11-30', 'Dẫn dắt các chiến dịch tiếp thị.', 'Cao cấp', 'Cử nhân Tiếp thị', 'Tại văn phòng', '1', 2),
+('Chuyên viên phân tích tài chính', '2-4 năm', '15-25 triệu/tháng', '2025-10-31', 'Phân tích dữ liệu tài chính.', 'Trung cấp', 'Cử nhân Tài chính', 'Kết hợp', '3', 3),
+('Nhà thiết kế đồ họa', '1-3 năm', '12-20 triệu/tháng', '2025-09-30', 'Tạo nội dung hình ảnh.', 'Sơ cấp', 'Cử nhân Thiết kế', 'Từ xa', '2', 4),
+('Chuyên viên nhân sự', '3-5 năm', '15-22 triệu/tháng', '2025-08-31', 'Quản lý quy trình tuyển dụng.', 'Trung cấp', 'Cử nhân Nhân sự', 'Tại văn phòng', '1', 1);
+
+-- Chèn dữ liệu mẫu vào bảng JobLocation
+INSERT INTO JobLocation (location, JobID) VALUES
+('Hà Nội', 1),
+('TP. Hồ Chí Minh', 2),
+('Đà Nẵng', 3),
+('Cần Thơ', 4),
+('Nha Trang', 5);
+
+-- Chèn dữ liệu mẫu vào bảng AppliedJob
+INSERT INTO AppliedJob (appliedDate, SeekerProfileID, JobID) VALUES
+('2025-05-01', 1, 1),
+('2025-05-02', 2, 2),
+('2025-05-03', 3, 3),
+('2025-05-04', 4, 4),
+('2025-05-05', 5, 5);
+
+-- Chèn dữ liệu mẫu vào bảng WishlistJob
+INSERT INTO WishlistJob (addedDate, SeekerProfileID, JobID) VALUES
+('2025-05-10', 1, 2),
+('2025-05-11', 2, 3),
+('2025-05-12', 3, 4),
+('2025-05-13', 4, 5),
+('2025-05-14', 5, 1);
+
+-- Chèn dữ liệu mẫu vào bảng CV
+INSERT INTO CV (CVFilePath, SeekerProfileID) VALUES
+('/hoso/nguyen_van_an_cv.pdf', 1),
+('/hoso/tran_thi_bich_cv.pdf', 2),
+('/hoso/le_thi_mai_cv.pdf', 3),
+('/hoso/pham_van_hung_cv.pdf', 4),
+('/hoso/ngo_thi_lan_cv.pdf', 5);

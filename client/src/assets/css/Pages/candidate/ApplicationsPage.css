@@ -1,0 +1,17 @@
+.applications-page{
+    min-height: 50vh;
+}
+
+h1{
+    text-align: center;
+}
+.applications-list {
+  display: grid;
+  gap: 1rem;
+}
+
+p{
+    /* text-align: center; */
+    font-size: 20px;
+    color: rgba(0, 0, 0, 0.532);
+}

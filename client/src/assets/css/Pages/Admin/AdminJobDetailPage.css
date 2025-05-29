@@ -1,0 +1,187 @@
+/* src/pages/AdminJobDetailPage/AdminJobDetailPage.css */
+.admin-job-detail {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 2rem;
+}
+
+.page-header {
+  display: flex;
+  align-items: center;
+  margin-bottom: 2rem;
+}
+
+.back-button {
+  background: none;
+  border: none;
+  color: #4a5568;
+  cursor: pointer;
+  font-size: 1rem;
+  padding: 0.5rem;
+  margin-right: 1rem;
+}
+
+.job-detail-container {
+  background-color: white;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  padding: 2rem;
+}
+
+.job-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 2rem;
+  padding-bottom: 1rem;
+  border-bottom: 1px solid #e2e8f0;
+}
+
+.job-actions {
+  display: flex;
+  gap: 0.75rem;
+}
+
+.edit-btn, .approve-btn, .reject-btn {
+  padding: 0.5rem 1rem;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.edit-btn {
+  background-color: #ebf8ff;
+  color: #2b6cb0;
+}
+
+.approve-btn {
+  background-color: #c6f6d5;
+  color: #276749;
+}
+
+.reject-btn {
+  background-color: #fed7d7;
+  color: #c53030;
+}
+
+.job-content {
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+}
+
+.job-info h2 {
+  font-size: 1.75rem;
+  margin-bottom: 0.5rem;
+  color: #2d3748;
+}
+
+.company-name {
+  font-size: 1.25rem;
+  color: #4a5568;
+}
+
+.job-meta {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 1rem;
+  margin-top: 1.5rem;
+}
+
+.meta-item {
+  padding: 1rem;
+  background-color: #f7fafc;
+  border-radius: 4px;
+}
+
+.meta-label {
+  display: block;
+  font-size: 0.875rem;
+  color: #718096;
+  margin-bottom: 0.25rem;
+}
+
+.meta-value {
+  font-weight: 500;
+  color: #2d3748;
+}
+
+.job-description h3 {
+  font-size: 1.25rem;
+  margin-bottom: 1rem;
+  color: #2d3748;
+  padding-bottom: 0.5rem;
+  border-bottom: 1px solid #e2e8f0;
+}
+
+.rejection-reason {
+  background-color: #fff5f5;
+  padding: 1.5rem;
+  border-radius: 4px;
+  border-left: 4px solid #fc8181;
+}
+
+.rejection-reason h3 {
+  color: #c53030;
+  margin-top: 0;
+  margin-bottom: 0.5rem;
+}
+
+/* Edit form styles */
+.job-edit-form {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.form-group label {
+  font-weight: 500;
+  color: #4a5568;
+}
+
+.form-group input, .form-group textarea {
+  padding: 0.75rem;
+  border: 1px solid #e2e8f0;
+  border-radius: 4px;
+  font-size: 1rem;
+}
+
+.form-group textarea {
+  resize: vertical;
+}
+
+.form-row {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 1rem;
+}
+
+.form-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 1rem;
+  margin-top: 1rem;
+}
+
+.cancel-btn, .save-btn {
+  padding: 0.75rem 1.5rem;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.cancel-btn {
+  background-color: #edf2f7;
+  color: #4a5568;
+}
+
+.save-btn {
+  background-color: #4299e1;
+  color: white;
+}

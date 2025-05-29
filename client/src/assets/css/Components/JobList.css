@@ -1,0 +1,18 @@
+/* src/components/Job/JobList.css */
+.job-list {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 1.5rem;
+  padding: 1rem 0;
+}
+
+@media (max-width: 640px) {
+  .job-list {
+    grid-template-columns: 1fr;
+  }
+}
+.job-list {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+  gap: 1.5rem;
+}

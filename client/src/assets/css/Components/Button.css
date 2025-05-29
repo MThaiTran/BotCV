@@ -1,0 +1,48 @@
+/* src/components/Button/Button.css */
+.btn {
+  display: inline-block;
+  font-weight: 600;
+  text-align: center;
+  white-space: nowrap;
+  vertical-align: middle;
+  user-select: none;
+  border: 1px solid transparent;
+  padding: 12px 24px;
+  font-size: 16px;
+  line-height: 1.5;
+  border-radius: 4px;
+  transition: all 0.3s ease;
+  cursor: pointer;
+}
+
+.btn--primary {
+  color: #fff;
+  background-color: #04AA6D;
+  border-color: #04AA6D;
+}
+
+.btn--primary:hover {
+  background-color: #038f5d;
+  border-color: #038f5d;
+}
+
+.btn--outline {
+  color: #04AA6D;
+  background-color: transparent;
+  border-color: #04AA6D;
+}
+
+.btn--outline:hover {
+  color: #fff;
+  background-color: #04AA6D;
+}
+
+.btn--full-width {
+  display: block;
+  width: 100%;
+}
+
+.btn:disabled {
+  opacity: 0.7;
+  cursor: not-allowed;
+}

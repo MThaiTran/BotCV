@@ -1,0 +1,82 @@
+CREATE TABLE UserAccount (
+    ID INTEGER IDENTITY(1,1) PRIMARY KEY,
+    email VARCHAR(255) NOT NULL,
+    password VARCHAR(255) NOT NULL,
+    profileImage VARCHAR(255),
+    userType VARCHAR(255), --Seeker, Admin, Company
+    registrationDate DATE
+);
+
+CREATE TABLE SeekerProfile (
+    ID INTEGER IDENTITY(1,1) PRIMARY KEY,
+    fullName VARCHAR(255) NOT NULL,
+    phoneNumber VARCHAR(255),
+    emailContact VARCHAR(255),
+    UserAccountID INTEGER NOT NULL,
+    FOREIGN KEY (UserAccountID) REFERENCES UserAccount(ID)
+);
+
+CREATE TABLE Company (
+    ID INTEGER IDENTITY(1,1) PRIMARY KEY,
+    name VARCHAR(255) NOT NULL,
+    description VARCHAR(255),
+    establishmentDate DATE,
+    companyWebsite VARCHAR(255),
+    companyEmail VARCHAR(255),
+    UserAccountID INTEGER NOT NULL,
+    FOREIGN KEY (UserAccountID) REFERENCES UserAccount(ID)
+);
+
+CREATE TABLE Job (
+    ID INTEGER IDENTITY(1,1) PRIMARY KEY,
+    name VARCHAR(255) NOT NULL,
+    jobExperience VARCHAR(255),
+    salaryRange VARCHAR(255),
+    expirationDate DATE,
+    jobDescription VARCHAR(MAX),
+    jobLevel VARCHAR(255),
+    jobEducation VARCHAR(255),
+    jobFromWork VARCHAR(255),
+    jobHireNumber VARCHAR(255),
+    CompanyID INTEGER NOT NULL,
+    FOREIGN KEY (CompanyID) REFERENCES Company(ID)
+);
+
+CREATE TABLE JobLocation (
+    ID INTEGER IDENTITY(1,1) PRIMARY KEY,
+    location VARCHAR(255) NOT NULL,
+    JobID INTEGER NOT NULL,
+    FOREIGN KEY (JobID) REFERENCES Job(ID)
+);
+
+CREATE TABLE JobCategory (
+    ID INTEGER IDENTITY(1,1) PRIMARY KEY,
+    categoryName VARCHAR(255) NOT NULL,
+    description VARCHAR(255) NOT NULL
+);
+
+CREATE TABLE AppliedJob (
+    ID INTEGER IDENTITY(1,1) PRIMARY KEY,
+    appliedDate DATE NOT NULL,
+    SeekerProfileID INTEGER NOT NULL,
+    JobID INTEGER NOT NULL,
+    FOREIGN KEY (SeekerProfileID) REFERENCES SeekerProfile(ID),
+    FOREIGN KEY (JobID) REFERENCES Job(ID)
+);
+
+
+CREATE TABLE WishlistJob (
+    ID INTEGER IDENTITY(1,1) PRIMARY KEY,
+    addedDate DATE NOT NULL,
+    SeekerProfileID INT NOT NULL,
+    JobID INTEGER NOT NULL,
+    FOREIGN KEY (SeekerProfileID ) REFERENCES SeekerProfile(ID),
+    FOREIGN KEY (JobID) REFERENCES Job(ID)
+);
+
+CREATE TABLE CV (
+    ID INTEGER IDENTITY(1,1) PRIMARY KEY,
+    CVFilePath VARCHAR(255) NOT NULL,
+    SeekerProfileID INT NOT NULL,
+    FOREIGN KEY (SeekerProfileID ) REFERENCES SeekerProfile(ID)
+);

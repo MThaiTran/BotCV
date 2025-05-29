@@ -1,0 +1,53 @@
+.application-card {
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+  padding: 1.25rem;
+  margin-bottom: 1rem;
+  background: #fff;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+}
+
+.application-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 1rem;
+}
+
+.status-badge {
+  color: #fff;
+  padding: 0.25rem 0.75rem;
+  border-radius: 20px;
+  font-size: 0.95rem;
+  font-weight: 500;
+}
+
+.application-details p {
+  margin: 0.25rem 0;
+}
+
+.job-title-link {
+  color: #2b6cb0;
+  text-decoration: none;
+  transition: color 0.2s;
+}
+
+.job-title-link:hover {
+  color: #1e4e8c;
+  text-decoration: underline;
+}
+
+.view-cv-btn {
+  display: inline-block;
+  padding: 8px 16px;
+  background-color: #48bb78;
+  color: white;
+  border-radius: 4px;
+  text-decoration: none;
+  font-size: 0.9rem;
+  transition: background-color 0.2s;
+}
+
+.view-cv-btn:hover {
+  background-color: #38a169;
+}

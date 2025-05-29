@@ -1,0 +1,23 @@
+/* src/pages/JobSearchPage/JobSearchPage.css */
+.job-search-page {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 2rem 1rem;
+}
+
+.job-search-page h1 {
+  text-align: center;
+  color: #1a365d;
+  margin-bottom: 2rem;
+  font-size: 2.5rem;
+}
+
+@media (max-width: 768px) {
+  .job-search-page {
+    padding: 1rem;
+  }
+  
+  .job-search-page h1 {
+    font-size: 2rem;
+  }
+}
