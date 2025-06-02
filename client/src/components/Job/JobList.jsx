@@ -7,20 +7,21 @@ const JobList = ({ jobs }) => {
     <div className="job-list">
       {jobs.map(job => (
         <JobCard 
-          key={job.id}
-          id={job.id}
+          key={job.ID}
+          ID={job.ID}
           name={job.name}
-          company={job.company.name}
-          location={job.location}
-          salary={job.salary}
-          type={job.type}
-          postedAt={job.postedAt}
-          tags={job.tags}
+          jobExperience={job.jobExperience}
+          salaryRange={job.salaryRange}
+          expirationDate={job.expirationDate}
+          jobLevel={job.jobLevel}
+          jobEducation={job.jobEducation}
+          jobFromWork={job.jobFromWork}
         />
       ))}
     </div>
   );
 };
+
 export default JobList;
 
 
