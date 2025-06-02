@@ -8,3 +8,4 @@ DB_PORT = 1433
 JWT_SECRET = my_secret_key
 
 # Dupplicate this and rename to .env, then config to your vars
+#anh yeu em
