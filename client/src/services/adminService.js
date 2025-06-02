@@ -1,189 +1,185 @@
 // src/services/adminService.js
+import axios from 'axios';
+
+// Tạo instance axios với config mặc định
+const api = axios.create({
+  baseURL: '/api',
+  headers: {
+    'Content-Type': 'application/json'
+  },
+  withCredentials: true // Để gửi kèm cookies trong request
+});
+
 export const adminService = {
   getAllUsers: async () => {
-    // Mock data - sẽ được thay thế bằng API call thực tế
-    await new Promise(resolve => setTimeout(resolve, 800)); // Giả lập độ trễ API
-    
-    return [
-      {
-        id: '1',
-        name: 'Nguyễn Văn A',
-        email: 'nguyenvana@example.com',
-        role: 'employer',
-        status: 'active',
-        createdAt: '2024-01-15T08:00:00Z'
-      },
-      {
-        id: '2',
-        name: 'Trần Thị B',
-        email: 'tranthib@example.com',
-        role: 'candidate',
-        status: 'active',
-        createdAt: '2024-02-20T10:30:00Z'
-      },
-      {
-        id: '3',
-        name: 'Lê Văn C',
-        email: 'levanc@example.com',
-        role: 'employer',
-        status: 'suspended',
-        createdAt: '2024-03-05T14:15:00Z'
-      },
-      {
-        id: '4',
-        name: 'Phạm Thị D',
-        email: 'phamthid@example.com',
-        role: 'candidate',
-        status: 'active',
-        createdAt: '2024-03-18T09:45:00Z'
-      }
-    ];
+    try {
+      const response = await axios.get('/api/userAccount?page=1&limit=100', {
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        withCredentials: true
+      });
+      console.log(response.data.data);
+      return response.data.data;
+    } catch (error) {
+      console.error('Error fetching users:', error.response?.data || error.message);
+      throw error;
+    }
   },
   
-    updateUserStatus: async (userId, newStatus) => {
-      // Mock API call
-      await new Promise(resolve => setTimeout(resolve, 500));
-      console.log(`User ${userId} status updated to ${newStatus}`);
-      return { success: true };
-    },
-    
-    deleteUser: async (userId) => {
-    // Mock API call
-    await new Promise(resolve => setTimeout(resolve, 800));
-    console.log(`User ${userId} deleted`);
-    return { success: true };
-    },
-    updateUser: async (userId, userData) => {
-        // Mock API call
-        await new Promise(resolve => setTimeout(resolve, 800));
-        
-        // Giả lập response từ server
-        const updatedUser = {
-        ...userData,
-        updatedAt: new Date().toISOString()
-        };
-        
-        console.log('Updated user:', updatedUser);
-        return updatedUser;
-    },
+  updateUserStatus: async (userId, newStatus) => {
+    try {
+      const response = await axios.put(`/api/userAccount/${userId}`, 
+        { status: newStatus },
+        {
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          withCredentials: true
+        }
+      );
+      return response.data;
+    } catch (error) {
+      console.error('Error updating user status:', error.response?.data || error.message);
+      throw error;
+    }
+  },
+  
+  deleteUser: async (userId) => {
+    try {
+      const response = await axios.delete(`/api/userAccount/${userId}`, {
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        withCredentials: true
+      });
+      return response.data;
+    } catch (error) {
+      console.error('Error deleting user:', error.response?.data || error.message);
+      throw error;
+    }
+  },
 
-    getAllJobs: async () => {
-        // Mock data
-        await new Promise(resolve => setTimeout(resolve, 800));
-        
-        return [
+  updateUser: async (userId, userData) => {
+    try {
+      const response = await axios.put(`/api/userAccount/${userId}`, 
+        userData,
         {
-            id: '1',
-            title: 'Frontend Developer',
-            company: 'Tech Corp',
-            location: 'Hà Nội',
-            salary: '20-30 triệu',
-            description: '<p>Chúng tôi đang tìm kiếm Frontend Developer có kinh nghiệm...</p>',
-            postedAt: '2024-05-01T08:00:00Z',
-            status: 'approved'
-        },
-        {
-            id: '2',
-            title: 'Backend Developer',
-            company: 'Digital Solutions',
-            location: 'TP. HCM',
-            salary: '25-35 triệu',
-            description: '<p>Backend Developer với kinh nghiệm NodeJS, Express...</p>',
-            postedAt: '2024-05-05T10:00:00Z',
-            status: 'pending'
-        },
-        {
-            id: '3',
-            title: 'UI/UX Designer',
-            company: 'Creative Studio',
-            location: 'Đà Nẵng',
-            salary: '15-25 triệu',
-            description: '<p>Thiết kế giao diện người dùng cho các ứng dụng web và mobile...</p>',
-            postedAt: '2024-05-03T09:30:00Z',
-            status: 'rejected',
-            rejectionReason: 'Thông tin không đầy đủ, thiếu mô tả chi tiết về yêu cầu công việc.'
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          withCredentials: true
         }
-        ];
-    },
-    
-    getJobById: async (id) => {
-        // Mock data
-        await new Promise(resolve => setTimeout(resolve, 500));
-        
-        const jobs = [
-        {
-            id: '1',
-            title: 'Frontend Developer',
-            company: 'Tech Corp',
-            location: 'Hà Nội',
-            salary: '20-30 triệu',
-            description: '<p>Chúng tôi đang tìm kiếm Frontend Developer có kinh nghiệm...</p><ul><li>Có kinh nghiệm với React</li><li>Hiểu biết về HTML, CSS, JavaScript</li></ul>',
-            postedAt: '2024-05-01T08:00:00Z',
-            status: 'approved'
+      );
+      return response.data;
+    } catch (error) {
+      console.error('Error updating user:', error.response?.data || error.message);
+      throw error;
+    }
+  },
+
+  getAllJobs: async () => {
+    try {
+      const response = await axios.get('/api/job?page=1&limit=100', {
+        headers: {
+          'Content-Type': 'application/json'
         },
-        {
-            id: '2',
-            title: 'Backend Developer',
-            company: 'Digital Solutions',
-            location: 'TP. HCM',
-            salary: '25-35 triệu',
-            description: '<p>Backend Developer với kinh nghiệm NodeJS, Express...</p><ul><li>Có kinh nghiệm với NodeJS, Express</li><li>Hiểu biết về RESTful API</li></ul>',
-            postedAt: '2024-05-05T10:00:00Z',
-            status: 'pending'
+        withCredentials: true
+      });
+      console.log('Jobs data:', response.data.data);
+      return response.data.data;
+    } catch (error) {
+      console.error('Error fetching jobs:', error.response?.data || error.message);
+      throw error;
+    }
+  },
+  
+  getJobById: async (id) => {
+    try {
+      const response = await axios.get(`/api/job/${id}`, {
+        headers: {
+          'Content-Type': 'application/json'
         },
+        withCredentials: true
+      });
+      return response.data;
+    } catch (error) {
+      console.error('Error fetching job details:', error.response?.data || error.message);
+      throw error;
+    }
+  },
+  
+  updateJobStatus: async (id, status, reason = '') => {
+    try {
+      const response = await axios.put(`/api/job/${id}`, 
+        { status, rejectionReason: reason },
         {
-            id: '3',
-            title: 'UI/UX Designer',
-            company: 'Creative Studio',
-            location: 'Đà Nẵng',
-            salary: '15-25 triệu',
-            description: '<p>Thiết kế giao diện người dùng cho các ứng dụng web và mobile...</p><ul><li>Có kinh nghiệm với Figma, Adobe XD</li><li>Portfolio đa dạng</li></ul>',
-            postedAt: '2024-05-03T09:30:00Z',
-            status: 'rejected',
-            rejectionReason: 'Thông tin không đầy đủ, thiếu mô tả chi tiết về yêu cầu công việc.'
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          withCredentials: true
         }
-        ];
-        
-        return jobs.find(job => job.id === id);
-    },
-    
-    updateJobStatus: async (id, status, reason = '') => {
-        // Mock API call
-        await new Promise(resolve => setTimeout(resolve, 500));
-        console.log(`Job ${id} status updated to ${status}${reason ? ` with reason: ${reason}` : ''}`);
-        return { success: true };
-    },
-    
-    updateJob: async (id, jobData) => {
-        // Mock API call
-        await new Promise(resolve => setTimeout(resolve, 800));
-        console.log('Job updated:', jobData);
-        return { success: true };
-    },
-    
-    deleteJob: async (id) => {
-        // Mock API call
-        await new Promise(resolve => setTimeout(resolve, 500));
-        console.log(`Job ${id} deleted`);
-        return { success: true };
-    },
-    createJob: async (jobData) => {
-        // Mock API call
-        await new Promise(resolve => setTimeout(resolve, 800));
-        
-        // Giả lập response từ server
-        const newJob = {
-        id: Math.random().toString(36).substr(2, 9),
-        ...jobData,
-        postedAt: new Date().toISOString(),
-        status: 'pending'
-        };
-        
-        console.log('Created new job:', newJob);
-        return newJob;
-    },
-    getBasicStats: async () => {
-  // Mock data
+      );
+      return response.data;
+    } catch (error) {
+      console.error('Error updating job status:', error.response?.data || error.message);
+      throw error;
+    }
+  },
+  
+  updateJob: async (id, jobData) => {
+    try {
+      const response = await axios.put(`/api/job/${id}`, 
+        jobData,
+        {
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          withCredentials: true
+        }
+      );
+      return response.data;
+    } catch (error) {
+      console.error('Error updating job:', error.response?.data || error.message);
+      throw error;
+    }
+  },
+  
+  deleteJob: async (id) => {
+    try {
+      const response = await axios.delete(`/api/job/${id}`, {
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        withCredentials: true
+      });
+      return response.data;
+    } catch (error) {
+      console.error('Error deleting job:', error.response?.data || error.message);
+      throw error;
+    }
+  },
+
+  createJob: async (jobData) => {
+    try {
+      const response = await axios.post('/api/job', 
+        jobData,
+        {
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          withCredentials: true
+        }
+      );
+      return response.data;
+    } catch (error) {
+      console.error('Error creating job:', error.response?.data || error.message);
+      throw error;
+    }
+  },
+
+  getBasicStats: async () => {
+    // Mock data
     await new Promise(resolve => setTimeout(resolve, 500));
     
     return {
@@ -195,70 +191,90 @@ export const adminService = {
         pendingCompanies: 12,
         pendingReports: 5
     };
-    },
-    getAllCompanies: async () => {
-    // Mock data
-    await new Promise(resolve => setTimeout(resolve, 500));
-    
-    return [
-        {
-        id: '1',
-        name: 'Công ty ABC',
-        industry: 'Công nghệ thông tin',
-        location: 'Hà Nội',
-        website: 'https://abc.com',
-        contactEmail: 'contact@abc.com',
-        description: 'Công ty phát triển phần mềm',
-        status: 'approved'
+  },
+
+  getAllCompanies: async () => {
+    try {
+      const response = await axios.get('/api/company?page=1&limit=100', {
+        headers: {
+          'Content-Type': 'application/json'
         },
-        {
-        id: '2',
-        name: 'Công ty XYZ',
-        industry: 'Tài chính',
-        location: 'TP. HCM',
-        website: 'https://xyz.com',
-        contactEmail: 'contact@xyz.com',
-        description: 'Công ty tài chính',
-        status: 'pending'
-        }
-    ];
-    },
-
-    createCompany: async (companyData) => {
-    // Mock API call
-    await new Promise(resolve => setTimeout(resolve, 500));
-    
-    // Giả lập response từ server
-    const newCompany = {
-        id: Math.random().toString(36).substr(2, 9),
-        ...companyData,
-        status: 'pending',
-        createdAt: new Date().toISOString()
-    };
-    
-    return newCompany;
-    },
-
-    updateCompany: async (id, companyData) => {
-    // Mock API call
-    await new Promise(resolve => setTimeout(resolve, 500));
-    
-    // Giả lập response từ server
-    return {
-        ...companyData,
-        updatedAt: new Date().toISOString()
-    };
-    },
-
-    deleteCompany: async (id) => {
-    // Mock API call
-    await new Promise(resolve => setTimeout(resolve, 500));
-    return { success: true };
-    },
-
-    updateCompanyStatus: async (id, status) => {
-    // Mock API call
-    await new Promise(resolve => setTimeout(resolve, 500));
-    return { success: true };
+        withCredentials: true
+      });
+      console.log('Companies data:', response.data.data);
+      return response.data.data;
+    } catch (error) {
+      console.error('Error fetching companies:', error.response?.data || error.message);
+      throw error;
     }
+  },
+
+  createCompany: async (companyData) => {
+    try {
+      const response = await axios.post('/api/company', 
+        companyData,
+        {
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          withCredentials: true
+        }
+      );
+      return response.data;
+    } catch (error) {
+      console.error('Error creating company:', error.response?.data || error.message);
+      throw error;
+    }
+  },
+
+  updateCompany: async (id, companyData) => {
+    try {
+      const response = await axios.put(`/api/company/${id}`, 
+        companyData,
+        {
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          withCredentials: true
+        }
+      );
+      return response.data;
+    } catch (error) {
+      console.error('Error updating company:', error.response?.data || error.message);
+      throw error;
+    }
+  },
+
+  deleteCompany: async (id) => {
+    try {
+      const response = await axios.delete(`/api/company/${id}`, {
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        withCredentials: true
+      });
+      return response.data;
+    } catch (error) {
+      console.error('Error deleting company:', error.response?.data || error.message);
+      throw error;
+    }
+  },
+
+  updateCompanyStatus: async (id, status) => {
+    try {
+      const response = await axios.put(`/api/company/${id}`, 
+        { status },
+        {
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          withCredentials: true
+        }
+      );
+      return response.data;
+    } catch (error) {
+      console.error('Error updating company status:', error.response?.data || error.message);
+      throw error;
+    }
+  }
 };
