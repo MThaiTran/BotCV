@@ -1,38 +1,52 @@
-// src/components/Job/JobFilter.jsx
 import React from 'react';
 import PropTypes from 'prop-types';
 import '../../assets/css/Components/JobFilter.css';
 
-const JobFilter = ({ filters, onFilterChange }) => {
-  const jobTypes = [
-    { value: 'full-time', label: 'Toàn thời gian' },
-    { value: 'part-time', label: 'Bán thời gian' },
-    { value: 'remote', label: 'Làm từ xa' }
-  ];
+const jobTypes = [
+  { value: 'full-time', label: 'Toàn thời gian' },
+  { value: 'part-time', label: 'Bán thời gian' },
+  { value: 'remote', label: 'Làm từ xa' }
+];
 
+const JobFilter = ({ filters, onFilterChange }) => {
+  // Xử lý input text (từ khóa, địa điểm)
   const handleInputChange = (e) => {
     onFilterChange({ ...filters, [e.target.name]: e.target.value });
+  };
+
+  // Xử lý chọn loại hình việc làm (checkbox)
+  const handleTypeChange = (e) => {
+    const { value, checked } = e.target;
+    let newTypes = Array.isArray(filters.types) ? [...filters.types] : [];
+    if (checked) {
+      if (!newTypes.includes(value)) newTypes.push(value);
+    } else {
+      newTypes = newTypes.filter(t => t !== value);
+    }
+    onFilterChange({ ...filters, types: newTypes });
   };
 
   return (
     <div className="job-filter">
       <div className="filter-group">
-        <label>Từ khóa</label>
+        <label htmlFor="keyword">Từ khóa</label>
         <input
           type="text"
+          id="keyword"
           name="keyword"
-          value={filters.keyword}
+          value={filters.keyword || ''}
           onChange={handleInputChange}
           placeholder="Nhập từ khóa..."
         />
       </div>
 
       <div className="filter-group">
-        <label>Địa điểm</label>
+        <label htmlFor="location">Địa điểm</label>
         <input
           type="text"
+          id="location"
           name="location"
-          value={filters.location}
+          value={filters.location || ''}
           onChange={handleInputChange}
           placeholder="Nhập địa điểm..."
         />
@@ -45,15 +59,10 @@ const JobFilter = ({ filters, onFilterChange }) => {
             <label key={type.value}>
               <input
                 type="checkbox"
-                name="type"
+                name="types"
                 value={type.value}
-                checked={filters.types?.includes(type.value)}
-                onChange={(e) => {
-                  const types = e.target.checked
-                    ? [...(filters.types || []), type.value]
-                    : filters.types?.filter(t => t !== type.value);
-                  onFilterChange({ ...filters, types });
-                }}
+                checked={Array.isArray(filters.types) && filters.types.includes(type.value)}
+                onChange={handleTypeChange}
               />
               {type.label}
             </label>
@@ -65,7 +74,11 @@ const JobFilter = ({ filters, onFilterChange }) => {
 };
 
 JobFilter.propTypes = {
-  filters: PropTypes.object.isRequired,
+  filters: PropTypes.shape({
+    keyword: PropTypes.string,
+    location: PropTypes.string,
+    types: PropTypes.arrayOf(PropTypes.string)
+  }).isRequired,
   onFilterChange: PropTypes.func.isRequired
 };
 

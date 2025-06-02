@@ -15,10 +15,12 @@ const AdminJobManagementPage = () => {
   const [rejectionReason, setRejectionReason] = useState('');
   const [showAddModal, setShowAddModal] = useState(false);
   const [newJob, setNewJob] = useState({
-    title: '',
-    company: '',
+    name: '',
+    companyName: '',
     location: '',
-    salary: '',
+    salaryMin: '',
+    salaryMax: '',
+    salaryCurrency: 'VND',
     description: '',
     requirements: ''
   });
@@ -53,7 +55,7 @@ const AdminJobManagementPage = () => {
   const handleApproveJob = async (jobId) => {
     try {
       await adminService.updateJobStatus(jobId, 'approved');
-      setJobs(jobs.map(job => 
+      setJobs(jobs.map(job =>
         job.id === jobId ? { ...job, status: 'approved' } : job
       ));
       setShowReviewModal(false);
@@ -65,7 +67,7 @@ const AdminJobManagementPage = () => {
   const handleRejectJob = async (jobId) => {
     try {
       await adminService.updateJobStatus(jobId, 'rejected', rejectionReason);
-      setJobs(jobs.map(job => 
+      setJobs(jobs.map(job =>
         job.id === jobId ? { ...job, status: 'rejected', rejectionReason } : job
       ));
       setShowReviewModal(false);
@@ -73,61 +75,6 @@ const AdminJobManagementPage = () => {
     } catch (error) {
       console.error('Error rejecting job:', error);
     }
-  };
-
-  const handleAddJob = async (e) => {
-    e.preventDefault();
-    
-    // Validate form
-    const errors = {};
-    if (!newJob.title.trim()) errors.title = 'Tiêu đề không được để trống';
-    if (!newJob.company.trim()) errors.company = 'Tên công ty không được để trống';
-    if (!newJob.location.trim()) errors.location = 'Địa điểm không được để trống';
-    if (!newJob.salary.trim()) errors.salary = 'Mức lương không được để trống';
-    if (!newJob.description.trim()) errors.description = 'Mô tả không được để trống';
-    
-    if (Object.keys(errors).length > 0) {
-      setFormErrors(errors);
-      return;
-    }
-    
-    try {
-      const createdJob = await adminService.createJob(newJob);
-      setJobs([createdJob, ...jobs]);
-      setShowAddModal(false);
-      resetNewJobForm();
-    } catch (error) {
-      console.error('Error creating job:', error);
-      setFormErrors({ general: 'Có lỗi xảy ra khi tạo tin tuyển dụng' });
-    }
-  };
-
-  const handleInputChange = (e) => {
-    const { name, value } = e.target;
-    setNewJob({
-      ...newJob,
-      [name]: value
-    });
-    
-    // Clear error when user types
-    if (formErrors[name]) {
-      setFormErrors({
-        ...formErrors,
-        [name]: ''
-      });
-    }
-  };
-
-  const resetNewJobForm = () => {
-    setNewJob({
-      title: '',
-      company: '',
-      location: '',
-      salary: '',
-      description: '',
-      requirements: ''
-    });
-    setFormErrors({});
   };
 
   const openDeleteModal = (job) => {
@@ -140,16 +87,79 @@ const AdminJobManagementPage = () => {
     setShowReviewModal(true);
   };
 
+  // Add Job
+  const handleAddJob = async (e) => {
+    e.preventDefault();
+    const errors = {};
+    if (!newJob.name.trim()) errors.name = 'Tiêu đề không được để trống';
+    if (!newJob.companyName.trim()) errors.companyName = 'Tên công ty không được để trống';
+    if (!newJob.location.trim()) errors.location = 'Địa điểm không được để trống';
+    if (!newJob.salaryMin) errors.salaryMin = 'Lương tối thiểu không được để trống';
+    if (!newJob.salaryMax) errors.salaryMax = 'Lương tối đa không được để trống';
+    if (Number(newJob.salaryMax) < Number(newJob.salaryMin)) errors.salaryMax = 'Lương tối đa phải lớn hơn tối thiểu';
+    if (!newJob.description.trim()) errors.description = 'Mô tả không được để trống';
+    if (!newJob.requirements.trim()) errors.requirements = 'Yêu cầu không được để trống';
+
+    if (Object.keys(errors).length > 0) {
+      setFormErrors(errors);
+      return;
+    }
+
+    try {
+      const createdJob = await adminService.createJob({
+        name: newJob.name,
+        company: { name: newJob.companyName },
+        location: newJob.location,
+        salary: {
+          min: Number(newJob.salaryMin),
+          max: Number(newJob.salaryMax),
+          currency: newJob.salaryCurrency
+        },
+        description: newJob.description,
+        requirements: newJob.requirements
+      });
+      setJobs([createdJob, ...jobs]);
+      setShowAddModal(false);
+      setNewJob({
+        name: '',
+        companyName: '',
+        location: '',
+        salaryMin: '',
+        salaryMax: '',
+        salaryCurrency: 'VND',
+        description: '',
+        requirements: ''
+      });
+      setFormErrors({});
+    } catch (error) {
+      setFormErrors({ general: 'Có lỗi xảy ra khi tạo tin tuyển dụng' });
+    }
+  };
+
+  const handleInputChange = (e) => {
+    const { name, value } = e.target;
+    setNewJob({
+      ...newJob,
+      [name]: value
+    });
+    if (formErrors[name]) {
+      setFormErrors({
+        ...formErrors,
+        [name]: ''
+      });
+    }
+  };
+
   const filteredJobs = jobs.filter(job => {
-    const matchesSearch = job.title.toLowerCase().includes(searchTerm.toLowerCase()) || 
-                         job.company.toLowerCase().includes(searchTerm.toLowerCase());
-    
+    const matchesSearch =
+      (job.name || '').toLowerCase().includes(searchTerm.toLowerCase()) ||
+      (job.company?.name || '').toLowerCase().includes(searchTerm.toLowerCase());
     if (currentFilter === 'all') return matchesSearch;
     return matchesSearch && job.status === currentFilter;
   });
 
   const getStatusLabel = (status) => {
-    switch(status) {
+    switch (status) {
       case 'pending': return 'Chờ duyệt';
       case 'approved': return 'Đã duyệt';
       case 'rejected': return 'Từ chối';
@@ -161,7 +171,7 @@ const AdminJobManagementPage = () => {
     <div className="admin-job-management">
       <div className="page-header">
         <h1>Quản lý tin tuyển dụng</h1>
-        <button 
+        <button
           className="add-job-btn"
           onClick={() => setShowAddModal(true)}
         >
@@ -180,25 +190,25 @@ const AdminJobManagementPage = () => {
         </div>
 
         <div className="filter-buttons">
-          <button 
+          <button
             className={`filter-btn ${currentFilter === 'all' ? 'active' : ''}`}
             onClick={() => setCurrentFilter('all')}
           >
             Tất cả
           </button>
-          <button 
+          <button
             className={`filter-btn ${currentFilter === 'pending' ? 'active' : ''}`}
             onClick={() => setCurrentFilter('pending')}
           >
             Chờ duyệt
           </button>
-          <button 
+          <button
             className={`filter-btn ${currentFilter === 'approved' ? 'active' : ''}`}
             onClick={() => setCurrentFilter('approved')}
           >
             Đã duyệt
           </button>
-          <button 
+          <button
             className={`filter-btn ${currentFilter === 'rejected' ? 'active' : ''}`}
             onClick={() => setCurrentFilter('rejected')}
           >
@@ -226,8 +236,8 @@ const AdminJobManagementPage = () => {
               {filteredJobs.map(job => (
                 <tr key={job.id}>
                   <td>{job.id}</td>
-                  <td>{job.title}</td>
-                  <td>{job.company}</td>
+                  <td>{job.name}</td>
+                  <td>{job.company?.name}</td>
                   <td>{new Date(job.postedAt).toLocaleDateString()}</td>
                   <td>
                     <span className={`status-badge ${job.status}`}>
@@ -235,23 +245,23 @@ const AdminJobManagementPage = () => {
                     </span>
                   </td>
                   <td className="action-buttons">
-                    <Link 
-                      to={`/admin/jobs/${job.id}`} 
+                    <Link
+                      to={`/admin/jobs/${job.id}`}
                       className="view-btn"
                     >
                       Xem
                     </Link>
-                    
+
                     {job.status === 'pending' && (
-                      <button 
+                      <button
                         className="review-btn"
                         onClick={() => openReviewModal(job)}
                       >
                         Duyệt
                       </button>
                     )}
-                    
-                    <button 
+
+                    <button
                       className="delete-btn"
                       onClick={() => openDeleteModal(job)}
                     >
@@ -270,17 +280,17 @@ const AdminJobManagementPage = () => {
         <div className="modal-overlay">
           <div className="modal-container">
             <h2>Xác nhận xóa tin tuyển dụng</h2>
-            <p>Bạn có chắc chắn muốn xóa tin tuyển dụng <strong>"{selectedJob?.title}"</strong>?</p>
+            <p>Bạn có chắc chắn muốn xóa tin tuyển dụng <strong>"{selectedJob?.name}"</strong>?</p>
             <p className="warning-text">Hành động này không thể hoàn tác.</p>
-            
+
             <div className="modal-actions">
-              <button 
+              <button
                 className="cancel-btn"
                 onClick={() => setShowDeleteModal(false)}
               >
                 Hủy
               </button>
-              <button 
+              <button
                 className="confirm-delete-btn"
                 onClick={() => handleDeleteJob(selectedJob.id)}
               >
@@ -297,19 +307,19 @@ const AdminJobManagementPage = () => {
           <div className="modal-container review-modal">
             <h2>Duyệt tin tuyển dụng</h2>
             <div className="job-review-info">
-              <p><strong>Tiêu đề:</strong> {selectedJob?.title}</p>
-              <p><strong>Công ty:</strong> {selectedJob?.company}</p>
+              <p><strong>Tiêu đề:</strong> {selectedJob?.name}</p>
+              <p><strong>Công ty:</strong> {selectedJob?.company?.name}</p>
               <p><strong>Ngày đăng:</strong> {new Date(selectedJob?.postedAt).toLocaleDateString()}</p>
             </div>
-            
+
             <div className="review-actions">
-              <button 
+              <button
                 className="approve-btn"
                 onClick={() => handleApproveJob(selectedJob.id)}
               >
                 Duyệt tin
               </button>
-              
+
               <div className="reject-section">
                 <h3>Từ chối tin</h3>
                 <textarea
@@ -318,7 +328,7 @@ const AdminJobManagementPage = () => {
                   onChange={(e) => setRejectionReason(e.target.value)}
                   rows="4"
                 ></textarea>
-                <button 
+                <button
                   className="reject-btn"
                   onClick={() => handleRejectJob(selectedJob.id)}
                   disabled={!rejectionReason.trim()}
@@ -327,8 +337,8 @@ const AdminJobManagementPage = () => {
                 </button>
               </div>
             </div>
-            
-            <button 
+
+            <button
               className="close-modal-btn"
               onClick={() => setShowReviewModal(false)}
             >
@@ -343,67 +353,86 @@ const AdminJobManagementPage = () => {
         <div className="modal-overlay">
           <div className="modal-container add-job-modal">
             <h2>Đăng tin tuyển dụng mới</h2>
-            
+
             {formErrors.general && (
               <div className="error-message general-error">{formErrors.general}</div>
             )}
-            
+
             <form onSubmit={handleAddJob}>
               <div className="form-group">
-                <label htmlFor="title">Tiêu đề công việc *</label>
+                <label htmlFor="name">Tiêu đề công việc *</label>
                 <input
                   type="text"
-                  id="title"
-                  name="title"
-                  value={newJob.title}
+                  id="name"
+                  name="name"
+                  value={newJob.name}
                   onChange={handleInputChange}
-                  className={formErrors.title ? 'error' : ''}
+                  className={formErrors.name ? 'error' : ''}
                 />
-                {formErrors.title && <div className="error-message">{formErrors.title}</div>}
+                {formErrors.name && <div className="error-message">{formErrors.name}</div>}
               </div>
-              
               <div className="form-group">
-                <label htmlFor="company">Công ty *</label>
+                <label htmlFor="companyName">Tên công ty *</label>
                 <input
                   type="text"
-                  id="company"
-                  name="company"
-                  value={newJob.company}
+                  id="companyName"
+                  name="companyName"
+                  value={newJob.companyName}
                   onChange={handleInputChange}
-                  className={formErrors.company ? 'error' : ''}
+                  className={formErrors.companyName ? 'error' : ''}
                 />
-                {formErrors.company && <div className="error-message">{formErrors.company}</div>}
+                {formErrors.companyName && <div className="error-message">{formErrors.companyName}</div>}
               </div>
-              
+              <div className="form-group">
+                <label htmlFor="location">Địa điểm *</label>
+                <input
+                  type="text"
+                  id="location"
+                  name="location"
+                  value={newJob.location}
+                  onChange={handleInputChange}
+                  className={formErrors.location ? 'error' : ''}
+                />
+                {formErrors.location && <div className="error-message">{formErrors.location}</div>}
+              </div>
               <div className="form-row">
                 <div className="form-group">
-                  <label htmlFor="location">Địa điểm *</label>
+                  <label htmlFor="salaryMin">Lương tối thiểu *</label>
                   <input
-                    type="text"
-                    id="location"
-                    name="location"
-                    value={newJob.location}
+                    type="number"
+                    id="salaryMin"
+                    name="salaryMin"
+                    value={newJob.salaryMin}
                     onChange={handleInputChange}
-                    className={formErrors.location ? 'error' : ''}
+                    className={formErrors.salaryMin ? 'error' : ''}
                   />
-                  {formErrors.location && <div className="error-message">{formErrors.location}</div>}
+                  {formErrors.salaryMin && <div className="error-message">{formErrors.salaryMin}</div>}
                 </div>
-                
                 <div className="form-group">
-                  <label htmlFor="salary">Mức lương *</label>
+                  <label htmlFor="salaryMax">Lương tối đa *</label>
                   <input
-                    type="text"
-                    id="salary"
-                    name="salary"
-                    value={newJob.salary}
+                    type="number"
+                    id="salaryMax"
+                    name="salaryMax"
+                    value={newJob.salaryMax}
                     onChange={handleInputChange}
-                    className={formErrors.salary ? 'error' : ''}
-                    placeholder="VD: 20-30 triệu"
+                    className={formErrors.salaryMax ? 'error' : ''}
                   />
-                  {formErrors.salary && <div className="error-message">{formErrors.salary}</div>}
+                  {formErrors.salaryMax && <div className="error-message">{formErrors.salaryMax}</div>}
+                </div>
+                <div className="form-group">
+                  <label htmlFor="salaryCurrency">Đơn vị</label>
+                  <select
+                    id="salaryCurrency"
+                    name="salaryCurrency"
+                    value={newJob.salaryCurrency}
+                    onChange={handleInputChange}
+                  >
+                    <option value="VND">VND</option>
+                    <option value="USD">USD</option>
+                  </select>
                 </div>
               </div>
-              
               <div className="form-group">
                 <label htmlFor="description">Mô tả công việc *</label>
                 <textarea
@@ -412,34 +441,34 @@ const AdminJobManagementPage = () => {
                   value={newJob.description}
                   onChange={handleInputChange}
                   className={formErrors.description ? 'error' : ''}
-                  rows="6"
+                  rows="4"
                 ></textarea>
                 {formErrors.description && <div className="error-message">{formErrors.description}</div>}
               </div>
-              
               <div className="form-group">
-                <label htmlFor="requirements">Yêu cầu công việc</label>
+                <label htmlFor="requirements">Yêu cầu công việc *</label>
                 <textarea
                   id="requirements"
                   name="requirements"
                   value={newJob.requirements}
                   onChange={handleInputChange}
-                  rows="6"
+                  className={formErrors.requirements ? 'error' : ''}
+                  rows="4"
                 ></textarea>
+                {formErrors.requirements && <div className="error-message">{formErrors.requirements}</div>}
               </div>
-              
               <div className="modal-actions">
-                <button 
+                <button
                   type="button"
                   className="cancel-btn"
                   onClick={() => {
                     setShowAddModal(false);
-                    resetNewJobForm();
+                    setFormErrors({});
                   }}
                 >
                   Hủy
                 </button>
-                <button 
+                <button
                   type="submit"
                   className="confirm-btn"
                 >

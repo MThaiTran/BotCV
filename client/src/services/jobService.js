@@ -78,197 +78,100 @@
 
 // src/services/jobService.js
 // src/services/jobService.js
-import axios from 'axios';
-
-const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000/api';
-
 const mockJobs = [
   {
-    "ID": 1,
-    "name": "Frontend Developer",
-    "jobExperience": "2-3 năm",
-    "salaryRange": "15-25 triệu/tháng",
-    "expirationDate": "2025-12-31T00:00:00.000Z",
-    "jobDescription": "Phát triển giao diện người dùng với React và các công nghệ web hiện đại.",
-    "jobLevel": "Trung cấp",
-    "jobEducation": "Cử nhân Công nghệ thông tin",
-    "jobFromWork": "Tại văn phòng",
-    "jobHireNumber": "2",
-    "CompanyID": 1
+    id: "job-101",
+    name: "Frontend Developer",
+    postedAt: "2025-05-01T08:00:00Z",
+    views: 245,
+    applications: 18,
+    description: "<p>We are looking for a skilled Frontend Developer to join our team.</p>",
+    jobLevel: "Mid-level",
+    jobType: "Full-time",
+    jobCategory: "Software Development",
+    status: "active",
+    company: {
+      name: "Tech Solutions",
+      logo: "https://via.placeholder.com/50"
+    },
+    location: "Hà Nội",
+    salary: {
+      min: 15000000,
+      max: 25000000,
+      currency: "VND"
+    }
   },
-  {
-    "ID": 2,
-    "name": "Quản lý tiếp thị",
-    "jobExperience": "Trên 5 năm",
-    "salaryRange": "25-35 triệu/tháng",
-    "expirationDate": "2025-11-30T00:00:00.000Z",
-    "jobDescription": "Dẫn dắt các chiến dịch tiếp thị.",
-    "jobLevel": "Cao cấp",
-    "jobEducation": "Cử nhân Tiếp thị",
-    "jobFromWork": "Tại văn phòng",
-    "jobHireNumber": "1",
-    "CompanyID": 2
-  }
+  
 ];
-
 const mockEmployerJobs = [
   {
-    "id": "job-101",
-    "title": "Frontend Developer",
-    "postedAt": "2025-05-01T08:00:00Z",
-    "views": 245,
-    "applications": 18,
-    "status": "active",
-    "company": {
-      "name": "Tech Solutions",
-      "logo": "https://via.placeholder.com/50"
+    id: "job-101",
+    name: "Frontend Developer",
+    postedAt: "2025-05-01T08:00:00Z",
+    views: 245,
+    applications: 18,
+    status: "active",
+    company: {
+      name: "Tech Solutions",
+      logo: "https://via.placeholder.com/50"
     },
-    "location": "Hà Nội",
-    "salary": {
-      "min": 15000000,
-      "max": 25000000,
-      "currency": "VND"
+    location: "Hà Nội",
+    salary: {
+      min: 15000000,
+      max: 25000000,
+      currency: "VND"
     }
   },
-  {
-    "id": "job-102",
-    "title": "Backend Developer",
-    "postedAt": "2025-05-05T09:30:00Z",
-    "views": 187,
-    "applications": 12,
-    "status": "active",
-    "company": {
-      "name": "Tech Solutions",
-      "logo": "https://via.placeholder.com/50"
-    },
-    "location": "Hà Nội",
-    "salary": {
-      "min": 20000000,
-      "max": 30000000,
-      "currency": "VND"
-    }
-  },
-  {
-    "id": "job-103",
-    "title": "UI/UX Designer",
-    "postedAt": "2025-04-15T10:15:00Z",
-    "views": 320,
-    "applications": 25,
-    "status": "expired",
-    "company": {
-      "name": "Tech Solutions",
-      "logo": "https://via.placeholder.com/50"
-    },
-    "location": "Hồ Chí Minh",
-    "salary": {
-      "min": 12000000,
-      "max": 18000000,
-      "currency": "VND"
-    }
-  },
-  {
-    "id": "job-104",
-    "title": "DevOps Engineer",
-    "postedAt": "2025-05-10T14:20:00Z",
-    "views": 156,
-    "applications": 8,
-    "status": "active",
-    "company": {
-      "name": "Tech Solutions",
-      "logo": "https://via.placeholder.com/50"
-    },
-    "location": "Đà Nẵng",
-    "salary": {
-      "min": 25000000,
-      "max": 40000000,
-      "currency": "VND"
-    }
-  },
-  {
-    "id": "job-105",
-    "title": "Mobile Developer",
-    "postedAt": "2025-04-20T11:45:00Z",
-    "views": 210,
-    "applications": 15,
-    "status": "expired",
-    "company": {
-      "name": "Tech Solutions",
-      "logo": "https://via.placeholder.com/50"
-    },
-    "location": "Hồ Chí Minh",
-    "salary": {
-      "min": 18000000,
-      "max": 28000000,
-      "currency": "VND"
-    }
-  }
+  
 ];
-
 export const jobService = {
-  // Tìm kiếm công việc
+  // Hàm tìm kiếm công việc
   searchJobs: async (filters) => {
-    try {
-      const response = await axios.get(`${API_URL}/job`);
-      return response.data.data;
-    } catch (error) {
-      console.error('Lỗi khi tìm kiếm công việc:', error);
-      throw error;
-    }
+    // Giả lập delay API
+    await new Promise(resolve => setTimeout(resolve, 800));
+    
+    // Trả về danh sách công việc đã lọc (có thể thêm logic lọc ở đây)
+    return mockJobs.map(job => ({
+      id: job.id,
+      name: job.name,
+      company: job.company,
+      location: job.location,
+      description: job.description,
+      salary: job.salary,
+      type: "Full-time", // Thêm trường này vì JobCard component cần nó
+      postedAt: new Date().toISOString().split('T')[0], // Giả lập ngày đăng
+      // tags: job.requirements.slice(0, 3) // Lấy 3 yêu cầu đầu tiên làm tags
+      tags: [job.jobLevel, job.jobEducation, job.jobFromwork] // Giả lập tags
+      
+    }));
   },
-
-  // Lấy chi tiết công việc theo ID
+  
+  // Hàm lấy chi tiết công việc theo ID
   getJobDetails: async (id) => {
-    try {
-      const response = await axios.get(`${API_URL}/job/${id}`);
-      return response.data;
-      return mock[id];
-    } catch (error) {
-      console.error('Lỗi khi lấy chi tiết công việc:', error);
-      throw error;
+    // Giả lập delay API
+    await new Promise(resolve => setTimeout(resolve, 500));
+    
+    // Tìm công việc theo ID
+    const job = mockJobs.find(job => job.id === id);
+    if (!job) {
+      throw new Error('Job not found');
     }
+    return job;
   },
 
-  // Tạo công việc mới
-  createJob: async (jobData) => {
-    try {
-      const response = await axios.post(`${API_URL}/jobs`, jobData);
-      return response.data;
-    } catch (error) {
-      console.error('Lỗi khi tạo công việc:', error);
-      throw error;
-    }
+   getEmployerJobs: async (employerId) => {
+    // Giả lập delay API
+    await new Promise(resolve => setTimeout(resolve, 800));
+    
+    // Trả về danh sách công việc của nhà tuyển dụng
+    return mockEmployerJobs;
   },
-
-  // Cập nhật công việc
-  updateJob: async (id, jobData) => {
-    try {
-      const response = await axios.put(`${API_URL}/jobs/${id}`, jobData);
-      return response.data;
-    } catch (error) {
-      console.error('Lỗi khi cập nhật công việc:', error);
-      throw error;
-    }
-  },
-
-  // Xóa công việc
-  deleteJob: async (id) => {
-    try {
-      const response = await axios.delete(`${API_URL}/jobs/${id}`);
-      return response.data;
-    } catch (error) {
-      console.error('Lỗi khi xóa công việc:', error);
-      throw error;
-    }
-  },
-
-  // Lấy danh sách công việc của nhà tuyển dụng
-  getEmployerJobs: async (employerId) => {
-    try {
-      const response = await axios.get(`${API_URL}/employer/${employerId}/jobs`);
-      return response.data;
-    } catch (error) {
-      console.error('Lỗi khi lấy danh sách công việc của nhà tuyển dụng:', error);
-      throw error;
-    }
+  
+  deleteJob: async (jobId) => {
+    // Giả lập delay API
+    await new Promise(resolve => setTimeout(resolve, 500));
+    
+    // Trả về kết quả thành công
+    return { success: true, message: "Xóa tin tuyển dụng thành công" };
   }
 };

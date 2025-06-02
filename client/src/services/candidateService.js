@@ -4,32 +4,45 @@ export const candidateService = {
     // Mock data
     return [
       {
-        id: '1',
-        name: 'Nguyễn Văn A',
-        email: 'a.nguyen@example.com',
-        phone: '0912345678',
-        address: 'Hà Nội',
-        appliedPosition: 'Frontend Developer',
-        appliedDate: '2024-05-01',
-        status: 'pending',
-        resumeUrl: '/cv/candidate-a.pdf',
-        companyId: '1'
+        id: "appliedJobId1",
+        status: "pending",
+        appliedDate: "2025-05-30T10:00:00Z",
+        seekerProfile: {
+          id: "seeker1",
+          fullName: "Nguyễn Văn A",
+          emailContact: "a.nguyen@example.com",
+          phoneNumber: "0912345678"
+        },
+        job: {
+          id: "job1",
+          name: "Frontend Developer"
+        }
       }
     ];
   },
 
   getCandidateById: async (id) => {
     return {
-      id: '1',
-      name: 'Nguyễn Văn A',
-      email: 'a.nguyen@example.com',
-      phone: '0912345678',
-      address: 'Hà Nội',
-      appliedPosition: 'Frontend Developer',
-      appliedDate: '2024-05-01',
-      status: 'pending',
-      resumeUrl: '/cv/candidate-a.pdf'
-    };
+      seekerProfile: {
+        id: 1,
+        fullName: "Nguyễn Văn A",
+        phoneNumber: "0912345678",
+        emailContact: "a.nguyen@example.com",
+        address: "Hà Nội"
+      },
+      applications: [
+        {
+          id: 5,
+          job: { name: "Frontend Developer" },
+          appliedDate: "2025-05-30T10:00:00Z",
+          status: "pending"
+        }
+      ],
+      cv: {
+        id: 10,
+        cvFilePath: "/uploads/cv_nguyenvana.pdf"
+      }
+        };
   },
 
   sendCandidateEmail: async ({ email, type, position, candidateName }) => {

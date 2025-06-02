@@ -85,7 +85,7 @@ const Header = () => {
                         <span>{currentUser?.name?.charAt(0) || 'U'}</span>
                       )}
                     </div>
-                    <span className="user-name">{currentUser?.name || 'Người dùng'}</span>
+                    <span className="user-name">{currentUser?.name || 'Người dùng'}</span> {/* cần lấy tên user */}
                     <i className={`dropdown-arrow ${showDropdown ? 'active' : ''}`}></i>
                   </button>
 

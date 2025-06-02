@@ -1,4 +1,3 @@
-// src/pages/ManageCandidatesPage/ManageCandidatesPage.jsx
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { useAuth } from '../../contexts/AuthContext';
@@ -13,23 +12,24 @@ const ManageCandidatesPage = () => {
   useEffect(() => {
     const fetchCandidates = async () => {
       try {
+        // Lấy danh sách appliedJob theo companyId  
         const data = await candidateService.getCandidates(currentUser.companyId);
         setCandidates(data);
       } catch (error) {
         console.error('Error fetching candidates:', error);
       }
     };
-    fetchCandidates();
+    if (currentUser?.companyId) fetchCandidates();
   }, [currentUser]);
 
-  const handleSendEmail = async (candidateId, type) => {
-    const candidate = candidates.find(c => c.id === candidateId);
+  const handleSendEmail = async (appliedJobId, type) => {
+    const appliedJob = candidates.find(c => c.id === appliedJobId);
     try {
       await candidateService.sendCandidateEmail({
-        email: candidate.email,
+        email: appliedJob.seekerProfile.emailContact,
         type,
-        position: candidate.appliedPosition,
-        candidateName: candidate.name
+        position: appliedJob.job.name,
+        candidateName: appliedJob.seekerProfile.fullName
       });
       alert(`Đã gửi ${type === 'invite' ? 'lời mời' : 'từ chối'} thành công`);
     } catch (error) {
@@ -41,7 +41,7 @@ const ManageCandidatesPage = () => {
     <div className="manage-candidates-container">
       <div className="header-section">
         <h1>Quản lý ứng viên</h1>
-        <br></br>
+        <br />
         <input
           type="text"
           placeholder="Tìm kiếm theo tên ứng viên..."
@@ -63,19 +63,19 @@ const ManageCandidatesPage = () => {
           </thead>
           <tbody>
             {candidates
-              .filter(c => c.name.toLowerCase().includes(searchTerm.toLowerCase()))
-              .map(candidate => (
-                <tr key={candidate.id}>
-                  <td>{candidate.name}</td>
-                  <td>{candidate.appliedPosition}</td>
+              .filter(c => c.seekerProfile.fullName.toLowerCase().includes(searchTerm.toLowerCase()))
+              .map(appliedJob => (
+                <tr key={appliedJob.id}>
+                  <td>{appliedJob.seekerProfile.fullName}</td>
+                  <td>{appliedJob.job.name}</td>
                   <td>
-                    <span className={`status-badge ${candidate.status}`}>
-                      {candidate.status}
+                    <span className={`status-badge ${appliedJob.status}`}>
+                      {appliedJob.status}
                     </span>
                   </td>
                   <td>
                     <Link 
-                      to={`/candidates/${candidate.id}`}
+                      to={`/candidates/${appliedJob.seekerProfile.id}`}
                       className="view-profile-link"
                     >
                       Xem hồ sơ
@@ -83,13 +83,13 @@ const ManageCandidatesPage = () => {
                   </td>
                   <td>
                     <button 
-                      onClick={() => handleSendEmail(candidate.id, 'invite')}
+                      onClick={() => handleSendEmail(appliedJob.id, 'invite')}
                       className="action-btn invite"
                     >
                       Gửi lời mời
                     </button>
                     <button 
-                      onClick={() => handleSendEmail(candidate.id, 'reject')}
+                      onClick={() => handleSendEmail(appliedJob.id, 'reject')}
                       className="action-btn reject"
                     >
                       Từ chối

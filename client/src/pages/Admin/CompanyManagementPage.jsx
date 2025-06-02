@@ -1,3 +1,4 @@
+// src/pages/Admin/CompanyManagementPage.jsx
 import React, { useState, useEffect } from 'react';
 import '../../assets/css/Pages/Admin/CompanyManagementPage.css';
 import { adminService } from '../../services/adminService';
@@ -119,7 +120,7 @@ const CompanyManagementPage = () => {
   };
 
   const filteredCompanies = companies.filter(company => {
-    const matchesSearch = company.name.toLowerCase().includes(searchTerm.toLowerCase());
+    const matchesSearch = (company.name || '').toLowerCase().includes(searchTerm.toLowerCase());
     if (currentFilter === 'all') return matchesSearch;
     return matchesSearch && company.status === currentFilter;
   });
@@ -192,11 +193,10 @@ const CompanyManagementPage = () => {
 
       {/* Add Company Modal */}
       {showAddModal && (
-        <div className="modal"> 
+        <div className="modal">
           {formErrors.general && (
             <div className="general-error">{formErrors.general}</div>
           )}
-          
           <form onSubmit={handleAddCompany}>
             <h2>Thêm công ty mới</h2>
             <div className="form-group">
@@ -210,7 +210,6 @@ const CompanyManagementPage = () => {
               />
               {formErrors.name && <div className="error-message">{formErrors.name}</div>}
             </div>
-            
             <div className="form-group">
               <label htmlFor="industry">Lĩnh vực</label>
               <input
@@ -222,7 +221,6 @@ const CompanyManagementPage = () => {
               />
               {formErrors.industry && <div className="error-message">{formErrors.industry}</div>}
             </div>
-            
             <div className="form-group">
               <label htmlFor="location">Địa điểm</label>
               <input
@@ -234,7 +232,6 @@ const CompanyManagementPage = () => {
               />
               {formErrors.location && <div className="error-message">{formErrors.location}</div>}
             </div>
-            
             <div className="form-group">
               <label htmlFor="website">Website</label>
               <input
@@ -244,7 +241,6 @@ const CompanyManagementPage = () => {
                 onChange={(e) => handleInputChange(e)}
               />
             </div>
-            
             <div className="form-group">
               <label htmlFor="contactEmail">Email liên hệ</label>
               <input
@@ -256,7 +252,6 @@ const CompanyManagementPage = () => {
               />
               {formErrors.contactEmail && <div className="error-message">{formErrors.contactEmail}</div>}
             </div>
-            
             <div className="form-group">
               <label htmlFor="description">Mô tả</label>
               <textarea
@@ -266,7 +261,6 @@ const CompanyManagementPage = () => {
                 onChange={(e) => handleInputChange(e)}
               />
             </div>
-            
             <div className="button-group">
               <button type="button" className="secondary" onClick={() => setShowAddModal(false)}>Hủy</button>
               <button type="submit" className="primary">Thêm</button>
@@ -281,7 +275,6 @@ const CompanyManagementPage = () => {
           {formErrors.general && (
             <div className="general-error">{formErrors.general}</div>
           )}
-          
           <form onSubmit={handleEditCompany}>
             <h2>Chỉnh sửa công ty</h2>
             <div className="form-group">
@@ -295,7 +288,6 @@ const CompanyManagementPage = () => {
               />
               {formErrors.name && <div className="error-message">{formErrors.name}</div>}
             </div>
-            
             <div className="form-group">
               <label htmlFor="edit-industry">Lĩnh vực</label>
               <input
@@ -307,7 +299,6 @@ const CompanyManagementPage = () => {
               />
               {formErrors.industry && <div className="error-message">{formErrors.industry}</div>}
             </div>
-            
             <div className="form-group">
               <label htmlFor="edit-location">Địa điểm</label>
               <input
@@ -319,7 +310,6 @@ const CompanyManagementPage = () => {
               />
               {formErrors.location && <div className="error-message">{formErrors.location}</div>}
             </div>
-            
             <div className="form-group">
               <label htmlFor="edit-website">Website</label>
               <input
@@ -329,7 +319,6 @@ const CompanyManagementPage = () => {
                 onChange={(e) => handleInputChange(e, true)}
               />
             </div>
-            
             <div className="form-group">
               <label htmlFor="edit-contactEmail">Email liên hệ</label>
               <input
@@ -341,7 +330,6 @@ const CompanyManagementPage = () => {
               />
               {formErrors.contactEmail && <div className="error-message">{formErrors.contactEmail}</div>}
             </div>
-            
             <div className="form-group">
               <label htmlFor="edit-description">Mô tả</label>
               <textarea
@@ -351,7 +339,6 @@ const CompanyManagementPage = () => {
                 onChange={(e) => handleInputChange(e, true)}
               />
             </div>
-            
             <div className="button-group">
               <button type="button" className="secondary" onClick={() => setShowEditModal(false)}>Hủy</button>
               <button type="submit" className="primary">Lưu thay đổi</button>

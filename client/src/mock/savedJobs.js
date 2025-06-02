@@ -1,56 +1,19 @@
 // src/mocks/savedJobsData.js
 const mockSavedJobs = [
   {
-    "id": "job-001",
-    "title": "Frontend Developer",
-    "company": {
-      "name": "Tech Solutions",
-      "logo": "https://via.placeholder.com/50"
-    },
-    "location": "Hà Nội",
-    "salary": {
-      "min": 15000000,
-      "max": 25000000,
-      "currency": "VND"
-    },
-    "type": "Full-time",
-    "postedAt": "2025-05-10",
-    "tags": ["React", "JavaScript", "TypeScript"]
+    id: "w1",
+    addedDate: "2025-05-30T10:00:00Z",
+    job: {
+      id: 88,
+      name: "Frontend Developer",
+      company: { name: "Công ty ABC" },
+      location: "Hà Nội",
+      salary: "15-25 triệu",
+      type: "Toàn thời gian",
+      postedAt: "2025-05-28T09:00:00Z",
+      tags: ["React", "JavaScript"]
+    }    
   },
-  {
-    "id": "job-003",
-    "title": "UI/UX Designer",
-    "company": {
-      "name": "Creative Minds",
-      "logo": "https://via.placeholder.com/50"
-    },
-    "location": "Đà Nẵng",
-    "salary": {
-      "min": 12000000,
-      "max": 18000000,
-      "currency": "VND"
-    },
-    "type": "Part-time",
-    "postedAt": "2025-05-15",
-    "tags": ["Figma", "Adobe XD", "User Research"]
-  },
-  {
-    "id": "job-005",
-    "title": "Mobile Developer",
-    "company": {
-      "name": "App Factory",
-      "logo": "https://via.placeholder.com/50"
-    },
-    "location": "Hồ Chí Minh",
-    "salary": {
-      "min": 18000000,
-      "max": 28000000,
-      "currency": "VND"
-    },
-    "type": "Remote",
-    "postedAt": "2025-05-17",
-    "tags": ["React Native", "Flutter", "iOS"]
-  }
 ];
 
 // Giả lập API service

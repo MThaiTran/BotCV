@@ -11,7 +11,7 @@ import JobDetailPage from '../pages/Job/JobDetailPage';
 import ProfilePage from '../pages/Auth/ProfilePage';
 import ApplicationsPage from '../pages/Candidate/ApplicationsPage';
 import SavedJobsPage from '../pages/Candidate/SavedJobsPage';
-import CompanyProfilePage from '../components/CompanyProfilePage';
+import CompanyProfilePage from '../pages/Employer/CompanyProfilePage';
 import PostJobPage from '../pages/Employer/PostJobPage';
 import ManageJobsPage from '../pages/Employer/ManageJobsPage';
 import ManageCandidatesPage from '../pages/Employer/ManageCandidatesPage';
@@ -76,6 +76,22 @@ export const router = createBrowserRouter([
         )
       },
       {
+        path: '/admin',
+        element: (
+          
+            <AdminDashboardPage />
+          
+        )
+      },
+      {
+        path: '/admin/dashboard',
+        element: (
+          
+            <AdminDashboardPage />
+          
+        )
+      },
+      {
         path: '/admin/users',
         element: (      
             <AdminUserManagementPage />
@@ -92,14 +108,6 @@ export const router = createBrowserRouter([
         path: '/admin/jobs/:id',
         element: (
             <AdminJobDetailPage />
-        )
-      },
-      {
-        path: '/admin',
-        element: (
-          
-            <AdminDashboardPage />
-          
         )
       },
       {

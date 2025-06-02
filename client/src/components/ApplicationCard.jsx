@@ -17,8 +17,8 @@ const ApplicationCard = ({ application }) => {
     <div className="application-card">
       <div className="application-header">
         <h3>
-          <Link to={`/jobs/${application.jobId}`} className="job-title-link">
-            {application.jobTitle}
+          <Link to={`/jobs/${application.job.id}`} className="job-title-link">
+            {application.job.name}
           </Link>
         </h3>
         <span className="status-badge" style={{ backgroundColor: status.color }}>
@@ -26,18 +26,20 @@ const ApplicationCard = ({ application }) => {
         </span>
       </div>
       <div className="application-details">
-        <p><strong>Công ty:</strong> {application.company}</p>
+        <p><strong>Công ty:</strong> {application.job.company.name}</p>
         <p><strong>Ngày ứng tuyển:</strong> {new Date(application.appliedDate).toLocaleDateString()}</p>
       </div>
       <div className="application-actions">
-        <a 
-          href={application.cvUrl} 
-          target="_blank" 
-          rel="noopener noreferrer"
-          className="view-cv-btn"
-        >
-          Xem CV đã nộp
-        </a>
+        {application.cvFilePath && (
+          <a 
+            href={application.cvFilePath} 
+            target="_blank" 
+            rel="noopener noreferrer"
+            className="view-cv-btn"
+          >
+            Xem CV đã nộp
+          </a>
+        )}
       </div>
     </div>
   );
@@ -45,11 +47,17 @@ const ApplicationCard = ({ application }) => {
 
 ApplicationCard.propTypes = {
   application: PropTypes.shape({
-    id: PropTypes.string.isRequired,
-    jobTitle: PropTypes.string.isRequired,
-    company: PropTypes.string.isRequired,
+    id: PropTypes.oneOfType([PropTypes.string, PropTypes.number]).isRequired,
     appliedDate: PropTypes.string.isRequired,
-    status: PropTypes.string.isRequired
+    status: PropTypes.string.isRequired,
+    job: PropTypes.shape({
+      id: PropTypes.oneOfType([PropTypes.string, PropTypes.number]).isRequired,
+      name: PropTypes.string.isRequired,
+      company: PropTypes.shape({
+        name: PropTypes.string.isRequired,
+      }).isRequired,
+    }).isRequired,
+    cvFilePath: PropTypes.string
   }).isRequired
 };
 

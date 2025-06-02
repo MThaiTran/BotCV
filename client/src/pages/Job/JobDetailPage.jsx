@@ -1,4 +1,3 @@
-// src/pages/JobDetailPage/JobDetailPage.jsx
 import React, { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
 import { jobService } from '../../services/jobService';
@@ -20,22 +19,23 @@ const JobDetailPage = () => {
         setLoading(false);
       }
     };
-    
     loadData();
   }, [id]);
 
   if (loading) return <div className="loading">Đang tải...</div>;
   if (!job) return <div className="error">Không tìm thấy việc làm</div>;
 
+  // Chuẩn hóa trường dữ liệu
+  // job.name (tên công việc), job.company.name, job.company.logo, job.salary.{min,max,currency}, job.location, job.description (html), job.requirements (html hoặc array), job.applicationUrl
   return (
     <div className="job-detail-container">
       <div className="job-header">
         <h1>{job.name}</h1>
         <div className="company-info">
-          {/* <img src="" alt={job.company.name} /> */}
-          <img src="" alt="" />
-          {/* <h2>{job.company.name || "NULL"}</h2> */}
-          <h2>NULL</h2>
+          {job.company?.logo && (
+            <img src={job.company.logo} alt={job.company.name} />
+          )}
+          <h2>{job.company?.name}</h2>
         </div>
       </div>
 
@@ -44,41 +44,53 @@ const JobDetailPage = () => {
           <div className="meta-item">
             <span className="label">Mức lương:</span>
             <span className="value">
-              {job.salaryRange}
+              {job.salary
+                ? `${new Intl.NumberFormat('vi-VN', {
+                    style: 'currency',
+                    currency: job.salary.currency || 'VND'
+                  }).format(job.salary.min)} - ${new Intl.NumberFormat('vi-VN', {
+                    style: 'currency',
+                    currency: job.salary.currency || 'VND'
+                  }).format(job.salary.max)}`
+                : 'Thỏa thuận'}
             </span>
           </div>
-          
           <div className="meta-item">
             <span className="label">Địa điểm:</span>
-            {/* <span className="value">{job.location}</span> */}
-            <span className="value">NULL</span>
+            <span className="value">{job.location}</span>
           </div>
         </div>
 
         <div className="job-section">
           <h2>Mô tả công việc</h2>
-          <div dangerouslySetInnerHTML={{ __html: job.jobDescription }} />
+          <div dangerouslySetInnerHTML={{ __html: job.description }} />
         </div>
 
         <div className="job-section">
           <h2>Yêu cầu</h2>
           <ul>
-            <li>{job.jobLevel}</li>
-            <li>{job.jobEducation}</li>
-            <li>{job.jobFromWork}</li>
-            <li>{job.jobHireNumber}</li>
+            {job.jobLevel ? (<li>{job.jobLevel}</li>) : null}
+            {job.jobEducation ? (<li>{job.jobEducation}</li>) : null}
+            {job.jobFromwork ? (<li>{job.jobFromwork}</li>) : null}
+            {job.jobHireNumber ? (<li>{job.jobHireNumber}</li>) : null}
           </ul>
         </div>
 
         <div className="job-actions">
-          <a 
-            href={job.applicationUrl}
-            className="apply-button"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Ứng tuyển ngay
-          </a>
+          {job.applicationUrl ? (
+            <a
+              href={job.applicationUrl}
+              className="apply-button"
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              Ứng tuyển ngay
+            </a>
+          ) : (
+            <button className="apply-button" disabled>
+              Không thể ứng tuyển
+            </button>
+          )}
         </div>
       </div>
     </div>

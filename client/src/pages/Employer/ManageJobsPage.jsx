@@ -1,4 +1,3 @@
-// src/pages/ManageJobsPage/ManageJobsPage.jsx
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { useAuth } from '../../contexts/AuthContext';
@@ -13,6 +12,7 @@ const ManageJobsPage = () => {
   useEffect(() => {
     const fetchJobs = async () => {
       try {
+        // Lấy danh sách job theo employer (user) id
         const data = await jobService.getEmployerJobs(currentUser.id);
         setJobs(data);
       } catch (error) {
@@ -20,6 +20,7 @@ const ManageJobsPage = () => {
       }
     };
     fetchJobs();
+    if (currentUser?.id) fetchJobs();
   }, [currentUser]);
 
   const handleDelete = async (jobId) => {
@@ -30,7 +31,7 @@ const ManageJobsPage = () => {
   };
 
   const filteredJobs = jobs.filter(job =>
-    job.title.toLowerCase().includes(searchTerm.toLowerCase())
+    job.name.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
   return (
@@ -65,13 +66,17 @@ const ManageJobsPage = () => {
           <tbody>
             {filteredJobs.map(job => (
               <tr key={job.id}>
-                <td>{job.title}</td>
+                <td>{job.name}</td>
                 <td>{new Date(job.postedAt).toLocaleDateString()}</td>
                 <td>{job.views}</td>
                 <td>{job.applications}</td>
                 <td>
                   <span className={`status-badge ${job.status}`}>
-                    {job.status === 'active' ? 'Đang hiển thị' : 'Đã hết hạn'}
+                    {job.status === 'active'
+                      ? 'Đang hiển thị'
+                      : job.status === 'expired'
+                      ? 'Đã hết hạn'
+                      : job.status}
                   </span>
                 </td>
                 <td>

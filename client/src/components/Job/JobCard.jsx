@@ -5,7 +5,7 @@ import '../../assets/css/Components/JobCard.css';
 
 const JobCard = ({
   id,
-  title,
+  name,
   company,
   location,
   salary,
@@ -17,7 +17,7 @@ const JobCard = ({
     <div className="job-card">
       <div className="job-card-header">
         <h2 className="job-title">
-          <Link to={`/jobs/${id}`}>{title}</Link>
+          <Link to={`/jobs/${id}`}>{name}</Link>
         </h2>
         <span className="company">{company}</span>
       </div>
@@ -42,7 +42,7 @@ const JobCard = ({
 
 JobCard.propTypes = {
   id: PropTypes.string,
-  title: PropTypes.string,
+  name: PropTypes.string,
   company: PropTypes.string,
   location: PropTypes.string,
   salary: PropTypes.string,
