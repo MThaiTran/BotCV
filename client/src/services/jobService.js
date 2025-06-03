@@ -127,7 +127,7 @@ export const jobService = {
 
   createJob: async (jobData) => {
     try {
-      const response = await axios.post(`${API_URL}/jobs`, jobData);
+      const response = await axios.post(`${API_URL}/job`, jobData);
       return response.data;
     } catch (error) {
       console.error('Error creating job:', error);

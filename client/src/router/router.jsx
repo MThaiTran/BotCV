@@ -21,6 +21,7 @@ import AdminJobManagementPage from '../pages/Admin/AdminJobManagementPage';
 import AdminJobDetailPage from '../pages/Admin/AdminJobDetailPage';
 import AdminDashboardPage from '../pages/Admin/AdminDashboardPage';
 import CompanyManagementPage  from '../pages/Admin/CompanyManagementPage';
+import EditJobPage from '../pages/Employer/EditJobPage';
 
 export const router = createBrowserRouter([
   {
@@ -40,7 +41,7 @@ export const router = createBrowserRouter([
       { path: '/saved-jobs', element: <SavedJobsPage />},
       {path: '/company-profile', element: <CompanyProfilePage />},
       {
-        path: '/jobs/post',
+        path: '/post-job',
         element: (
             <PostJobPage />
         )
@@ -48,7 +49,7 @@ export const router = createBrowserRouter([
       {
         path: '/jobs/edit/:id',
         element: (
-            <PostJobPage />
+            <EditJobPage />
         )
       },
       {
