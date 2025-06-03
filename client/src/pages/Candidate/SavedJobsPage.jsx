@@ -45,6 +45,7 @@ const SavedJobsPage = () => {
     const fetchSavedJobs = async () => {
       try {
         setLoading(true);
+        console.log(currentUser.id);
         const data = await savedJobsService.getSavedJobs(currentUser.id);
         setSavedJobs(data);
       } catch (error) {
@@ -75,15 +76,15 @@ const SavedJobsPage = () => {
           {savedJobs.length > 0 ? (
             savedJobs.map(item => (
               <JobCard 
-                key={item.id}
-                id={item.job.id}
-                title={item.job.name}
-                company={item.job.company.name}
-                location={item.job.location}
-                salary={item.job.salary}
-                type={item.job.type}
-                postedAt={item.job.postedAt}
-                tags={item.job.tags}
+                key={item.Job.ID}
+                ID={item.Job.ID}
+                name={item.Job.name}
+                jobExperience={item.Job.jobExperience}
+                salaryRange={item.Job.salaryRange}
+                expirationDate={item.Job.expirationDate}
+                jobLevel={item.Job.jobLevel}
+                jobEducation={item.Job.jobEducation}
+                jobFromWork={item.Job.jobFromWork}
                 onUnsave={() => handleUnsaveJob(item.id)}
                 isSaved={true}
               />
