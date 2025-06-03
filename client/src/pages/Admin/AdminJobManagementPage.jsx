@@ -176,7 +176,7 @@ const AdminJobManagementPage = () => {
   const filteredJobs = jobs.filter(job => {
     const matchesSearch =
       (job.name || '').toLowerCase().includes(searchTerm.toLowerCase()) ||
-      (job.company?.name || '').toLowerCase().includes(searchTerm.toLowerCase()); // Keep company search for now
+      (job.company?.name || '').toLowerCase().includes(searchTerm.toLowerCase());
     if (currentFilter === 'all') return matchesSearch;
     return matchesSearch && job.status === currentFilter;
   });

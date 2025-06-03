@@ -1,63 +1,81 @@
+// src/components/Job/JobCard.jsx
 import React from 'react';
 import PropTypes from 'prop-types';
 import { Link } from 'react-router-dom';
 import '../../assets/css/Components/JobCard.css';
 
 const JobCard = ({
-  ID,
-  name,
-  jobExperience,
-  salaryRange,
-  expirationDate,
-  jobLevel,
-  jobEducation,
-  jobFromWork,
+  id,
+  title,
+  company,
+  location,
+  salary,
+  type,
+  postedAt,
+  tags,
+  isSaved,
+  onUnsave
 }) => {
-  // Assuming CompanyID is not directly used in the card display
-  // and JobCategoryID is not directly used in the card display
-
   return (
     <div className="job-card">
       <div className="job-card-header">
         <h2 className="job-title">
-          {/* Link to job details using ID */}
-          <Link to={`/jobs/${ID}`}>{name}</Link>
+          <Link to={`/jobs/${id}`}>{title}</Link>
         </h2>
-        {/* Company name is not available in this data structure */}
-        {/* <span className="company">{company.name}</span> */}
+        {company && <span className="company">{company}</span>}
       </div>
       <div className="job-card-body">
         <div className="job-meta">
-          {/* Assuming location might be inferred or not available in this view */}
-          {/* <span>{location}</span> */}
-          {salaryRange && <span>{salaryRange}</span>}
-          {jobFromWork && <span>{jobFromWork}</span>}
-          {jobExperience && <span>{jobExperience} kinh nghiệm</span>}
+          {location && <span>{location}</span>}
+          {salary &&
+            <span>
+              {typeof salary === 'object'
+                ? `${salary.min.toLocaleString()} - ${salary.max.toLocaleString()} ${salary.currency || 'VND'}`
+                : salary}
+            </span>
+          }
+          {type && <span>{type}</span>}
         </div>
         <div className="job-tags">
-          {jobLevel && <span className="tag">{jobLevel}</span>}
-          {jobEducation && <span className="tag">{jobEducation}</span>}
+          {Array.isArray(tags) && tags.map((tag, idx) => (
+            <span className="tag" key={idx}>{tag}</span>
+          ))}
         </div>
-        {expirationDate && (
+        {postedAt && (
           <div className="job-date">
-            Hết hạn {new Date(expirationDate).toLocaleDateString('vi-VN')}
+            Đăng ngày {new Date(postedAt).toLocaleDateString('vi-VN')}
           </div>
         )}
+        <div className="job-card-footer">
+          {isSaved && typeof onUnsave === 'function' && (
+            <button className="unsave-btn" onClick={onUnsave}>
+              Bỏ lưu
+            </button>
+          )}
+        </div>
       </div>
     </div>
   );
 };
 
 JobCard.propTypes = {
-  ID: PropTypes.string.isRequired, // Assuming ID is a string
-  name: PropTypes.string.isRequired,
-  jobExperience: PropTypes.string,
-  salaryRange: PropTypes.string,
-  expirationDate: PropTypes.string,
-  jobLevel: PropTypes.string,
-  jobEducation: PropTypes.string,
-  jobFromWork: PropTypes.string, // Corresponds to job type
-  // CompanyID and JobCategoryID are not directly used as props for display
+  id: PropTypes.oneOfType([PropTypes.string, PropTypes.number]).isRequired,
+  title: PropTypes.string.isRequired,
+  company: PropTypes.string,
+  location: PropTypes.string,
+  salary: PropTypes.oneOfType([
+    PropTypes.string,
+    PropTypes.shape({
+      min: PropTypes.number,
+      max: PropTypes.number,
+      currency: PropTypes.string
+    })
+  ]),
+  type: PropTypes.string,
+  postedAt: PropTypes.string,
+  tags: PropTypes.arrayOf(PropTypes.string),
+  isSaved: PropTypes.bool,
+  onUnsave: PropTypes.func
 };
 
 export default JobCard;
