@@ -5,6 +5,7 @@ import * as yup from 'yup';
 import ReactQuill from 'react-quill-new';
 import 'react-quill-new/dist/quill.snow.css';
 import '../../assets/css/Pages/Employer/PostJobPage.css';
+import { jobService } from '../../services/jobService';
 
 const schema = yup.object().shape({
   name: yup.string().required('Tiêu đề là bắt buộc'),
@@ -33,7 +34,7 @@ const PostJobPage = () => {
   const descriptionRef = useRef('');
   const requirementsRef = useRef('');
 
-  const onSubmit = (data) => {
+  const onSubmit = async (data) => {
     // Chuẩn hóa dữ liệu gửi lên backend
     const payload = {
       name: data.name,
@@ -48,6 +49,15 @@ const PostJobPage = () => {
     };
     console.log('Job Data:', payload);
     // Gửi payload này lên backend
+    try {
+      const response = await jobService.createJob(payload);
+      console.log('Job created successfully:', response);
+      alert('Tin tuyển dụng đã được đăng thành công!');
+      // Redirect or clear form if needed
+    } catch (error) {
+      console.error('Error creating job:', error);
+      alert('Đã xảy ra lỗi khi đăng tin tuyển dụng.');
+    }
   };
 
   return (

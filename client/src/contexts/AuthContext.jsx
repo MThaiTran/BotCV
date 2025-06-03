@@ -17,7 +17,8 @@ const mockUser = {
     position: "Frontend Developer"
   },
   cvUrl: "https://example.com/cv/nguyenvana.pdf",
-  createdAt: "2024-10-15"
+  createdAt: "2024-10-15",
+  companyId: 1,
 };
 
 const AuthContext = createContext();

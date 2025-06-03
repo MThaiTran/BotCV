@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { useAuth } from '../../contexts/AuthContext';
 import { jobService } from '../../services/jobService';
+import { adminService } from '../../services/adminService';
 import '../../assets/css/Pages/Employer/ManageJobsPage.css';
 
 const ManageJobsPage = () => {
@@ -12,15 +13,24 @@ const ManageJobsPage = () => {
   useEffect(() => {
     const fetchJobs = async () => {
       try {
-        // Lấy danh sách job theo employer (user) id
-        const data = await jobService.getEmployerJobs(currentUser.id);
-        setJobs(data);
+        const allOrRelevantJobs = await adminService.getAllJobs();
+
+        const targetCompanyId = 1;
+
+        const filteredAndMappedJobs = allOrRelevantJobs
+          .map(job => ({ ...job, id: job.ID }))
+          .filter(job => job.CompanyID === targetCompanyId);
+
+        setJobs(filteredAndMappedJobs);
+
       } catch (error) {
-        console.error('Error fetching jobs:', error);
+        console.error('Error fetching or filtering jobs:', error);
+        setJobs([]);
       }
     };
+
     fetchJobs();
-    if (currentUser?.id) fetchJobs();
+
   }, [currentUser]);
 
   const handleDelete = async (jobId) => {
@@ -56,10 +66,14 @@ const ManageJobsPage = () => {
           <thead>
             <tr>
               <th>Tiêu đề</th>
-              <th>Ngày đăng</th>
+              <th>Ngày hết hạn</th>
+              <th>Trạng thái</th>
+              <th>Cấp bậc</th>
+              <th>Hình thức làm việc</th>
+              <th>Số lượng tuyển</th>
+              <th>Địa điểm</th>
               <th>Lượt xem</th>
               <th>Ứng tuyển</th>
-              <th>Trạng thái</th>
               <th>Thao tác</th>
             </tr>
           </thead>
@@ -67,9 +81,7 @@ const ManageJobsPage = () => {
             {filteredJobs.map(job => (
               <tr key={job.id}>
                 <td>{job.name}</td>
-                <td>{new Date(job.postedAt).toLocaleDateString()}</td>
-                <td>{job.views}</td>
-                <td>{job.applications}</td>
+                <td>{job.expirationDate ? new Date(job.expirationDate).toLocaleDateString() : ''}</td>
                 <td>
                   <span className={`status-badge ${job.status}`}>
                     {job.status === 'active'
@@ -79,14 +91,20 @@ const ManageJobsPage = () => {
                       : job.status}
                   </span>
                 </td>
+                <td>{job.jobLevel}</td>
+                <td>{job.jobFromWork}</td>
+                <td>{job.jobHireNumber}</td>
+                <td>{/* Địa điểm - cần dữ liệu từ API */}</td>
+                <td>{job.views}</td>
+                <td>{job.applications}</td>
                 <td>
-                  <Link 
-                    to={`/jobs/edit/${job.id}`} 
+                  <Link
+                    to={`/jobs/edit/${job.id}`}
                     className="action-btn edit"
                   >
                     Sửa
                   </Link>
-                  <button 
+                  <button
                     onClick={() => handleDelete(job.id)}
                     className="action-btn delete"
                   >
