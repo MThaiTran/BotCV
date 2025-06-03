@@ -16,7 +16,9 @@ const AdminUserManagementPage = () => {
     name: '',
     email: '',
     password: '',
-    role: 'candidate'
+    role: 'candidate',
+    profileImage: '',
+    registrationDate: ''
   });
   const [editUser, setEditUser] = useState({
     id: '',
@@ -86,20 +88,34 @@ const AdminUserManagementPage = () => {
       return;
     }
 
+    const userDataForApi = {
+      email: newUser.email,
+      password: newUser.password,
+      profileImage: newUser.profileImage,
+      userType: newUser.role === 'employer' ? 'Employer' : 'Seeker',
+      registrationDate: newUser.registrationDate ? newUser.registrationDate.split('T')[0] : new Date().toISOString().split('T')[0]
+    };
+
     try {
-      const createdUser = await adminService.createUser(newUser);
+      const createdUser = await adminService.createUser(userDataForApi);
       setUsers([...users, createdUser]);
       setShowAddModal(false);
       setNewUser({
         name: '',
         email: '',
         password: '',
-        role: 'candidate'
+        role: 'candidate',
+        profileImage: '',
+        registrationDate: ''
       });
       setFormErrors({});
     } catch (error) {
       console.error('Error creating user:', error);
-      setFormErrors({ general: 'Có lỗi xảy ra khi tạo người dùng' });
+      if (error.response && error.response.data && error.response.data.message) {
+        setFormErrors({ general: error.response.data.message });
+      } else {
+        setFormErrors({ general: 'Có lỗi xảy ra khi tạo người dùng' });
+      }
     }
   };
 
@@ -170,13 +186,14 @@ const AdminUserManagementPage = () => {
   };
 
   const openDeleteModal = (user) => {
-    setSelectedUser(user);
+    setSelectedUser({ ...user, id: user.ID });
     setShowDeleteModal(true);
   };
 
   const openEditModal = (user) => {
     const userWithCompany = {
       ...user,
+      id: user.ID,
       company: user.company || {
         name: '',
         address: '',
@@ -381,6 +398,26 @@ const AdminUserManagementPage = () => {
                   <option value="candidate">Ứng viên</option>
                   <option value="employer">Nhà tuyển dụng</option>
                 </select>
+              </div>
+              <div className="form-group">
+                <label htmlFor="profileImage">Ảnh Profile</label>
+                <input
+                  type="text"
+                  id="profileImage"
+                  name="profileImage"
+                  value={newUser.profileImage}
+                  onChange={handleInputChange}
+                />
+              </div>
+              <div className="form-group">
+                <label htmlFor="registrationDate">Ngày đăng ký</label>
+                <input
+                  type="datetime-local"
+                  id="registrationDate"
+                  name="registrationDate"
+                  value={newUser.registrationDate}
+                  onChange={handleInputChange}
+                />
               </div>
               <div className="modal-actions">
                 <button

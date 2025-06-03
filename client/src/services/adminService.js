@@ -276,5 +276,23 @@ export const adminService = {
       console.error('Error updating company status:', error.response?.data || error.message);
       throw error;
     }
+  },
+
+  createUser: async (userData) => {
+    try {
+      const response = await axios.post('/api/userAccount', 
+        userData,
+        {
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          withCredentials: true
+        }
+      );
+      return response.data;
+    } catch (error) {
+      console.error('Error creating user:', error.response?.data || error.message);
+      throw error;
+    }
   }
 };
