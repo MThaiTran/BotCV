@@ -12,15 +12,63 @@ const ManageCandidatesPage = () => {
   useEffect(() => {
     const fetchCandidates = async () => {
       try {
-        // Lấy danh sách appliedJob theo companyId  
-        const data = await candidateService.getCandidates(currentUser.companyId);
-        setCandidates(data);
+        const targetCompanyId = 1; // CompanyID cần lọc
+        const finalCandidates = []; // Mảng cuối cùng chứa ứng viên
+
+        // 1. Lấy tất cả jobs và lọc theo CompanyID
+        const allJobs = await candidateService.getAllJobs();
+        const jobsCO = allJobs.filter(job => job.CompanyID === targetCompanyId);
+        const jobIdsCO = jobsCO.map(job => job.ID); // Lấy danh sách JobID của công ty
+
+        // 2. Lấy tất cả appliedJobs và lọc theo JobID
+        const allAppliedJobs = await candidateService.getAllAppliedJobs();
+        const appliedJobCO = allAppliedJobs.filter(appliedJob =>
+          appliedJob.JobID && jobIdsCO.includes(appliedJob.JobID) // Lọc appliedJob có JobID thuộc danh sách job của công ty
+        );
+        const seekerProfileIdsCO = appliedJobCO.map(appliedJob => appliedJob.SeekerProfileID); // Lấy danh sách SeekerProfileID từ các appliedJob đã lọc
+
+        // 3. Lấy tất cả seekerProfiles và lọc theo SeekerProfileID
+        const allSeekerProfiles = await candidateService.getAllSeekerProfiles();
+        const seekerProfilesCO = allSeekerProfiles.filter(seekerProfile =>
+          seekerProfile.ID && seekerProfileIdsCO.includes(seekerProfile.ID) // Lọc seekerProfile có ID thuộc danh sách cần tìm
+        );
+
+        // 4. Kết hợp dữ liệu để tạo mảng candidates cuối cùng
+        // Duyệt qua các appliedJob đã lọc và kết hợp với thông tin job và seekerProfile
+        appliedJobCO.forEach(appliedJob => {
+          const job = jobsCO.find(j => j.ID === appliedJob.JobID);
+          const seekerProfile = seekerProfilesCO.find(sp => sp.ID === appliedJob.SeekerProfileID);
+
+          // Chỉ thêm vào nếu tìm thấy cả job và seekerProfile
+          if (job && seekerProfile) {
+            finalCandidates.push({
+              ...appliedJob, // Giữ lại thông tin từ appliedJob
+              id: appliedJob.id || appliedJob.ID, // Đảm bảo có trường id
+              job: { // Thông tin job
+                id: job.id || job.ID,
+                name: job.name // Giả sử trường tên job là 'name'
+              },
+              seekerProfile: { // Thông tin seekerProfile
+                id: seekerProfile.id || seekerProfile.ID,
+                fullName: seekerProfile.fullName, // Giả sử trường tên đầy đủ là 'fullName'
+                emailContact: seekerProfile.emailContact, // Giả sử trường email là 'emailContact'
+                phoneNumber: seekerProfile.phoneNumber // Giả sử trường số điện thoại là 'phoneNumber'
+                // Thêm các trường khác nếu cần cho hiển thị
+              }
+              // Cần đảm bảo các trường status, appliedDate (hoặc tên tương đương) có sẵn từ appliedJob
+            });
+          }
+        });
+
+        setCandidates(finalCandidates);
+
       } catch (error) {
-        console.error('Error fetching candidates:', error);
+        console.error('Error fetching, filtering, and combining candidate data:', error);
+        setCandidates([]); // Set empty array on error
       }
     };
-    if (currentUser?.companyId) fetchCandidates();
-  }, [currentUser]);
+    fetchCandidates();
+  }, []);
 
   const handleSendEmail = async (appliedJobId, type) => {
     const appliedJob = candidates.find(c => c.id === appliedJobId);
@@ -63,8 +111,9 @@ const ManageCandidatesPage = () => {
           </thead>
           <tbody>
             {candidates
-              .filter(c => c.seekerProfile.fullName.toLowerCase().includes(searchTerm.toLowerCase()))
-              .map(appliedJob => (
+              // Lọc theo searchTerm trên mảng candidates đã chuẩn bị
+              .filter(candidate => candidate.seekerProfile && candidate.seekerProfile.fullName.toLowerCase().includes(searchTerm.toLowerCase()))
+              .map(appliedJob => ( // Vẫn gọi là appliedJob vì cấu trúc dữ liệu tương tự
                 <tr key={appliedJob.id}>
                   <td>{appliedJob.seekerProfile.fullName}</td>
                   <td>{appliedJob.job.name}</td>
