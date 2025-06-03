@@ -1,4 +1,3 @@
-// src/pages/LoginPage/LoginPage.jsx
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import '../../assets/css/Pages/Auth/LoginPage.css';
@@ -12,20 +11,20 @@ const LoginPage = () => {
     password: '',
     rememberMe: false,
   });
-  
+
   const [errors, setErrors] = useState({});
   const [isLoading, setIsLoading] = useState(false);
-  
+
   const { login } = useAuth();
   const navigate = useNavigate();
-  
+
   const handleChange = (e) => {
     const { name, value, type, checked } = e.target;
     setFormData({
       ...formData,
       [name]: type === 'checkbox' ? checked : value,
     });
-    
+
     if (errors[name]) {
       setErrors({
         ...errors,
@@ -33,33 +32,38 @@ const LoginPage = () => {
       });
     }
   };
-  
+
   const validateForm = () => {
     const newErrors = {};
-    
+
     if (!formData.email.trim()) {
       newErrors.email = 'Vui lòng nhập email';
     } else if (!/\S+@\S+\.\S+/.test(formData.email)) {
       newErrors.email = 'Email không hợp lệ';
     }
-    
+
     if (!formData.password) {
       newErrors.password = 'Vui lòng nhập mật khẩu';
     }
-    
+
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
-  
+
   const handleSubmit = async (e) => {
     e.preventDefault();
-    
+
     if (!validateForm()) return;
-    
+
     try {
       setIsLoading(true);
-      await login(formData.email, formData.password, formData.rememberMe);
-      navigate('/');
+      // Giả sử login trả về user object
+      const user = await login(formData.email, formData.password, formData.rememberMe);
+      if (user && user.role === 'admin') {
+        navigate('/admin/dashboard');
+      } else {
+        navigate('/');
+      }
     } catch (error) {
       setErrors({
         ...errors,
@@ -69,23 +73,22 @@ const LoginPage = () => {
       setIsLoading(false);
     }
   };
-  
+
   return (
     <div className="login-page">
-      
       <main className="login-content">
         <div className="container">
           <div className="login-wrapper">
             <div className="login-form-container">
               <h1 className="form-title">Đăng nhập</h1>
               <p className="form-subtitle">Chào mừng bạn quay trở lại với BotCV</p>
-              
+
               {errors.general && (
                 <div className="alert alert-error">{errors.general}</div>
               )}
-              
+
               <form className="form" onSubmit={handleSubmit}>
-                <Input 
+                <Input
                   type="email"
                   id="email"
                   name="email"
@@ -96,8 +99,8 @@ const LoginPage = () => {
                   error={errors.email}
                   required
                 />
-                
-                <Input 
+
+                <Input
                   type="password"
                   id="password"
                   name="password"
@@ -108,7 +111,7 @@ const LoginPage = () => {
                   error={errors.password}
                   required
                 />
-                
+
                 <div className="login-options">
                   <div className="remember-me">
                     <input
@@ -124,18 +127,18 @@ const LoginPage = () => {
                     Quên mật khẩu?
                   </Link>
                 </div>
-                
-                <Button 
-                  type="submit" 
-                  variant="primary" 
+
+                <Button
+                  type="submit"
+                  variant="primary"
                   fullWidth
                   disabled={isLoading}
                 >
                   {isLoading ? 'Đang đăng nhập...' : 'Đăng nhập'}
                 </Button>
-                
+
                 <div className="form-divider">Hoặc đăng nhập bằng</div>
-                
+
                 <div className="social-login">
                   <button type="button" className="social-btn social-btn--google">
                     <span className="social-icon google-icon"></span>
@@ -146,13 +149,13 @@ const LoginPage = () => {
                     <span>Facebook</span>
                   </button>
                 </div>
-                
+
                 <div className="form-footer">
                   Chưa có tài khoản? <Link to="/dang-ky">Đăng ký ngay</Link>
                 </div>
               </form>
             </div>
-            
+
             <div className="login-banner">
               <div className="login-banner__content">
                 <h2>Tìm công việc mơ ước của bạn</h2>
@@ -162,7 +165,6 @@ const LoginPage = () => {
           </div>
         </div>
       </main>
-      
     </div>
   );
 };
