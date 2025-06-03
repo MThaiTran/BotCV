@@ -36,6 +36,7 @@ const Header = () => {
 
   return (
     <header className="header">
+    {console.log('User hiện tại :' + currentUser.name)}
       <div className="container">
         <div className="header-content">
           <div className="logo">
@@ -102,6 +103,7 @@ const Header = () => {
                             Thông tin tài khoản
                           </Link>
                         </li>
+                        
                         {currentUser?.role === 'candidate' && (
                           <>
                             <li>

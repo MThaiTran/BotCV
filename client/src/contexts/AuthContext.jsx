@@ -6,6 +6,7 @@ import React, { createContext, useContext, useState, useEffect } from 'react';
 const mockUser = {
   id: "user123",
   fullName: "Nguyễn Văn A",
+  password: "password",
   email: "nguyenvana@example.com",
   education: {
     school: "Đại học Bách Khoa Hà Nội",
