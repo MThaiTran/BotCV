@@ -16,13 +16,16 @@ const AdminJobManagementPage = () => {
   const [showAddModal, setShowAddModal] = useState(false);
   const [newJob, setNewJob] = useState({
     name: '',
-    companyName: '',
-    location: '',
-    salaryMin: '',
-    salaryMax: '',
-    salaryCurrency: 'VND',
-    description: '',
-    requirements: ''
+    jobExperience: '',
+    salaryRange: '',
+    expirationDate: '',
+    jobDescription: '',
+    jobLevel: '',
+    jobEducation: '',
+    jobFromWork: '',
+    jobHireNumber: '',
+    CompanyID: '',
+    JobCategoryID: ''
   });
   const [formErrors, setFormErrors] = useState({});
 
@@ -45,7 +48,7 @@ const AdminJobManagementPage = () => {
   const handleDeleteJob = async (jobId) => {
     try {
       await adminService.deleteJob(jobId);
-      setJobs(jobs.filter(job => job.id !== jobId));
+      setJobs(jobs.filter(job => job.ID !== jobId));
       setShowDeleteModal(false);
     } catch (error) {
       console.error('Error deleting job:', error);
@@ -92,13 +95,16 @@ const AdminJobManagementPage = () => {
     e.preventDefault();
     const errors = {};
     if (!newJob.name.trim()) errors.name = 'Tiêu đề không được để trống';
-    if (!newJob.companyName.trim()) errors.companyName = 'Tên công ty không được để trống';
-    if (!newJob.location.trim()) errors.location = 'Địa điểm không được để trống';
-    if (!newJob.salaryMin) errors.salaryMin = 'Lương tối thiểu không được để trống';
-    if (!newJob.salaryMax) errors.salaryMax = 'Lương tối đa không được để trống';
-    if (Number(newJob.salaryMax) < Number(newJob.salaryMin)) errors.salaryMax = 'Lương tối đa phải lớn hơn tối thiểu';
-    if (!newJob.description.trim()) errors.description = 'Mô tả không được để trống';
-    if (!newJob.requirements.trim()) errors.requirements = 'Yêu cầu không được để trống';
+    if (!newJob.jobExperience.trim()) errors.jobExperience = 'Kinh nghiệm không được để trống';
+    if (!newJob.salaryRange.trim()) errors.salaryRange = 'Mức lương không được để trống';
+    if (!newJob.expirationDate) errors.expirationDate = 'Ngày hết hạn không được để trống';
+    if (!newJob.jobDescription.trim()) errors.jobDescription = 'Mô tả công việc không được để trống';
+    if (!newJob.jobLevel.trim()) errors.jobLevel = 'Cấp bậc không được để trống';
+    if (!newJob.jobEducation.trim()) errors.jobEducation = 'Học vấn không được để trống';
+    if (!newJob.jobFromWork.trim()) errors.jobFromWork = 'Hình thức làm việc không được để trống';
+    if (!newJob.jobHireNumber) errors.jobHireNumber = 'Số lượng cần tuyển không được để trống';
+    if (!newJob.CompanyID) errors.CompanyID = 'ID Công ty không được để trống';
+    if (!newJob.JobCategoryID) errors.JobCategoryID = 'Danh mục công việc không được để trống';
 
     if (Object.keys(errors).length > 0) {
       setFormErrors(errors);
@@ -106,33 +112,50 @@ const AdminJobManagementPage = () => {
     }
 
     try {
-      const createdJob = await adminService.createJob({
+      // Prepare data to match the API structure
+      const jobData = {
         name: newJob.name,
-        company: { name: newJob.companyName },
-        location: newJob.location,
-        salary: {
-          min: Number(newJob.salaryMin),
-          max: Number(newJob.salaryMax),
-          currency: newJob.salaryCurrency
-        },
-        description: newJob.description,
-        requirements: newJob.requirements
-      });
-      setJobs([createdJob, ...jobs]);
-      setShowAddModal(false);
-      setNewJob({
-        name: '',
-        companyName: '',
-        location: '',
-        salaryMin: '',
-        salaryMax: '',
-        salaryCurrency: 'VND',
-        description: '',
-        requirements: ''
-      });
-      setFormErrors({});
+        jobExperience: newJob.jobExperience,
+        salaryRange: newJob.salaryRange,
+        expirationDate: newJob.expirationDate,
+        jobDescription: newJob.jobDescription,
+        jobLevel: newJob.jobLevel,
+        jobEducation: newJob.jobEducation,
+        jobFromWork: newJob.jobFromWork,
+        jobHireNumber: parseInt(newJob.jobHireNumber, 10),
+        CompanyID: parseInt(newJob.CompanyID, 10),
+        JobCategoryID: parseInt(newJob.JobCategoryID, 10),
+        // status: 'pending' // Set initial status as pending
+      };
+
+      const response = await adminService.createJob(jobData);
+      
+      if (response && response.data) {
+        setJobs([response.data, ...jobs]);
+        setShowAddModal(false);
+        // Reset form
+        setNewJob({
+          name: '',
+          jobExperience: '',
+          salaryRange: '',
+          expirationDate: '',
+          jobDescription: '',
+          jobLevel: '',
+          jobEducation: '',
+          jobFromWork: '',
+          jobHireNumber: '',
+          CompanyID: '',
+          JobCategoryID: ''
+        });
+        setFormErrors({});
+      } else {
+        throw new Error('Invalid response from server');
+      }
     } catch (error) {
-      setFormErrors({ general: 'Có lỗi xảy ra khi tạo tin tuyển dụng' });
+      console.error('Error creating job:', error);
+      setFormErrors({ 
+        general: error.response?.data?.message || 'Có lỗi xảy ra khi tạo tin tuyển dụng' 
+      });
     }
   };
 
@@ -153,7 +176,7 @@ const AdminJobManagementPage = () => {
   const filteredJobs = jobs.filter(job => {
     const matchesSearch =
       (job.name || '').toLowerCase().includes(searchTerm.toLowerCase()) ||
-      (job.company?.name || '').toLowerCase().includes(searchTerm.toLowerCase());
+      (job.company?.name || '').toLowerCase().includes(searchTerm.toLowerCase()); // Keep company search for now
     if (currentFilter === 'all') return matchesSearch;
     return matchesSearch && job.status === currentFilter;
   });
@@ -246,7 +269,7 @@ const AdminJobManagementPage = () => {
                   </td>
                   <td className="action-buttons">
                     <Link
-                      to={`/admin/jobs/${job.id}`}
+                      to={`/admin/jobs/${job.ID}`}
                       className="view-btn"
                     >
                       Xem
@@ -292,7 +315,7 @@ const AdminJobManagementPage = () => {
               </button>
               <button
                 className="confirm-delete-btn"
-                onClick={() => handleDeleteJob(selectedJob.id)}
+                onClick={() => handleDeleteJob(selectedJob.ID)}
               >
                 Xóa tin
               </button>
@@ -371,98 +394,156 @@ const AdminJobManagementPage = () => {
                 />
                 {formErrors.name && <div className="error-message">{formErrors.name}</div>}
               </div>
+
               <div className="form-group">
-                <label htmlFor="companyName">Tên công ty *</label>
+                <label htmlFor="jobExperience">Kinh nghiệm *</label>
                 <input
                   type="text"
-                  id="companyName"
-                  name="companyName"
-                  value={newJob.companyName}
+                  id="jobExperience"
+                  name="jobExperience"
+                  value={newJob.jobExperience}
                   onChange={handleInputChange}
-                  className={formErrors.companyName ? 'error' : ''}
+                  className={formErrors.jobExperience ? 'error' : ''}
                 />
-                {formErrors.companyName && <div className="error-message">{formErrors.companyName}</div>}
+                {formErrors.jobExperience && <div className="error-message">{formErrors.jobExperience}</div>}
               </div>
+
               <div className="form-group">
-                <label htmlFor="location">Địa điểm *</label>
+                <label htmlFor="salaryRange">Mức lương *</label>
                 <input
                   type="text"
-                  id="location"
-                  name="location"
-                  value={newJob.location}
+                  id="salaryRange"
+                  name="salaryRange"
+                  value={newJob.salaryRange}
                   onChange={handleInputChange}
-                  className={formErrors.location ? 'error' : ''}
+                  className={formErrors.salaryRange ? 'error' : ''}
                 />
-                {formErrors.location && <div className="error-message">{formErrors.location}</div>}
+                {formErrors.salaryRange && <div className="error-message">{formErrors.salaryRange}</div>}
               </div>
-              <div className="form-row">
-                <div className="form-group">
-                  <label htmlFor="salaryMin">Lương tối thiểu *</label>
-                  <input
-                    type="number"
-                    id="salaryMin"
-                    name="salaryMin"
-                    value={newJob.salaryMin}
-                    onChange={handleInputChange}
-                    className={formErrors.salaryMin ? 'error' : ''}
-                  />
-                  {formErrors.salaryMin && <div className="error-message">{formErrors.salaryMin}</div>}
-                </div>
-                <div className="form-group">
-                  <label htmlFor="salaryMax">Lương tối đa *</label>
-                  <input
-                    type="number"
-                    id="salaryMax"
-                    name="salaryMax"
-                    value={newJob.salaryMax}
-                    onChange={handleInputChange}
-                    className={formErrors.salaryMax ? 'error' : ''}
-                  />
-                  {formErrors.salaryMax && <div className="error-message">{formErrors.salaryMax}</div>}
-                </div>
-                <div className="form-group">
-                  <label htmlFor="salaryCurrency">Đơn vị</label>
-                  <select
-                    id="salaryCurrency"
-                    name="salaryCurrency"
-                    value={newJob.salaryCurrency}
-                    onChange={handleInputChange}
-                  >
-                    <option value="VND">VND</option>
-                    <option value="USD">USD</option>
-                  </select>
-                </div>
-              </div>
+
               <div className="form-group">
-                <label htmlFor="description">Mô tả công việc *</label>
-                <textarea
-                  id="description"
-                  name="description"
-                  value={newJob.description}
+                <label htmlFor="expirationDate">Ngày hết hạn *</label>
+                <input
+                  type="date"
+                  id="expirationDate"
+                  name="expirationDate"
+                  value={newJob.expirationDate}
                   onChange={handleInputChange}
-                  className={formErrors.description ? 'error' : ''}
+                  className={formErrors.expirationDate ? 'error' : ''}
+                />
+                {formErrors.expirationDate && <div className="error-message">{formErrors.expirationDate}</div>}
+              </div>
+
+              <div className="form-group">
+                <label htmlFor="jobDescription">Mô tả công việc *</label>
+                <textarea
+                  id="jobDescription"
+                  name="jobDescription"
+                  value={newJob.jobDescription}
+                  onChange={handleInputChange}
+                  className={formErrors.jobDescription ? 'error' : ''}
                   rows="4"
                 ></textarea>
-                {formErrors.description && <div className="error-message">{formErrors.description}</div>}
+                {formErrors.jobDescription && <div className="error-message">{formErrors.jobDescription}</div>}
               </div>
+
               <div className="form-group">
-                <label htmlFor="requirements">Yêu cầu công việc *</label>
-                <textarea
-                  id="requirements"
-                  name="requirements"
-                  value={newJob.requirements}
+                <label htmlFor="jobLevel">Cấp bậc *</label>
+                <input
+                  type="text"
+                  id="jobLevel"
+                  name="jobLevel"
+                  value={newJob.jobLevel}
                   onChange={handleInputChange}
-                  className={formErrors.requirements ? 'error' : ''}
-                  rows="4"
-                ></textarea>
-                {formErrors.requirements && <div className="error-message">{formErrors.requirements}</div>}
+                  className={formErrors.jobLevel ? 'error' : ''}
+                />
+                {formErrors.jobLevel && <div className="error-message">{formErrors.jobLevel}</div>}
               </div>
+
+              <div className="form-group">
+                <label htmlFor="jobEducation">Học vấn *</label>
+                <input
+                  type="text"
+                  id="jobEducation"
+                  name="jobEducation"
+                  value={newJob.jobEducation}
+                  onChange={handleInputChange}
+                  className={formErrors.jobEducation ? 'error' : ''}
+                />
+                {formErrors.jobEducation && <div className="error-message">{formErrors.jobEducation}</div>}
+              </div>
+
+              <div className="form-group">
+                <label htmlFor="jobFromWork">Hình thức làm việc *</label>
+                <input
+                  type="text"
+                  id="jobFromWork"
+                  name="jobFromWork"
+                  value={newJob.jobFromWork}
+                  onChange={handleInputChange}
+                  className={formErrors.jobFromWork ? 'error' : ''}
+                />
+                {formErrors.jobFromWork && <div className="error-message">{formErrors.jobFromWork}</div>}
+              </div>
+
+              <div className="form-group">
+                <label htmlFor="jobHireNumber">Số lượng cần tuyển *</label>
+                <input
+                  type="number"
+                  id="jobHireNumber"
+                  name="jobHireNumber"
+                  value={newJob.jobHireNumber}
+                  onChange={handleInputChange}
+                  className={formErrors.jobHireNumber ? 'error' : ''}
+                />
+                {formErrors.jobHireNumber && <div className="error-message">{formErrors.jobHireNumber}</div>}
+              </div>
+
+              <div className="form-group">
+                <label htmlFor="JobCategoryID">Danh mục công việc *</label>
+                <input
+                  type="number"
+                  id="JobCategoryID"
+                  name="JobCategoryID"
+                  value={newJob.JobCategoryID}
+                  onChange={handleInputChange}
+                  className={formErrors.JobCategoryID ? 'error' : ''}
+                />
+                {formErrors.JobCategoryID && <div className="error-message">{formErrors.JobCategoryID}</div>}
+              </div>
+
+              <div className="form-group">
+                <label htmlFor="CompanyID">ID Công ty *</label>
+                <input
+                  type="number"
+                  id="CompanyID"
+                  name="CompanyID"
+                  value={newJob.CompanyID}
+                  onChange={handleInputChange}
+                  className={formErrors.CompanyID ? 'error' : ''}
+                />
+                {formErrors.CompanyID && <div className="error-message">{formErrors.CompanyID}</div>}
+              </div>
+
               <div className="modal-actions">
                 <button
                   type="button"
                   className="cancel-btn"
                   onClick={() => {
                     setShowAddModal(false);
+                    setNewJob({
+                      name: '',
+                      jobExperience: '',
+                      salaryRange: '',
+                      expirationDate: '',
+                      jobDescription: '',
+                      jobLevel: '',
+                      jobEducation: '',
+                      jobFromWork: '',
+                      jobHireNumber: '',
+                      CompanyID: '',
+                      JobCategoryID: ''
+                    });
                     setFormErrors({});
                   }}
                 >

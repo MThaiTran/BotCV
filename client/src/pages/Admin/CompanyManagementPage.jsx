@@ -18,9 +18,19 @@ const CompanyManagementPage = () => {
     location: '',
     website: '',
     contactEmail: '',
-    description: ''
+    description: '',
+    establishmentDate: ''
   });
-  const [editCompany, setEditCompany] = useState(null);
+  const [editCompany, setEditCompany] = useState({
+    name: '',
+    industry: '',
+    location: '',
+    website: '',
+    contactEmail: '',
+    description: '',
+    establishmentDate: '',
+    id: null
+  });
   const [formErrors, setFormErrors] = useState({});
 
   useEffect(() => {
@@ -31,7 +41,9 @@ const CompanyManagementPage = () => {
     try {
       setIsLoading(true);
       const data = await adminService.getAllCompanies();
-      setCompanies(data);
+      // Ánh xạ ID từ tên trường backend (giả định là ID) sang id (lowercase)
+      const companiesWithMappedId = data.map(company => ({ ...company, id: company.ID }));
+      setCompanies(companiesWithMappedId); // Set state với dữ liệu đã ánh xạ
     } catch (error) {
       console.error('Error fetching companies:', error);
     } finally {
@@ -53,10 +65,22 @@ const CompanyManagementPage = () => {
     }
 
     try {
-      const createdCompany = await adminService.createCompany(newCompany);
+      // Tạo object dữ liệu để gửi đến API, ánh xạ tên trường và thêm UserAccountID
+      const companyDataForApi = {
+        name: newCompany.name,
+        description: newCompany.description,
+        // Ánh xạ tên trường từ state sang API
+        companyWebsite: newCompany.website, 
+        companyEmail: newCompany.contactEmail, // Ánh xạ contactEmail sang companyEmail
+        // Xử lý establishmentDate để gửi định dạng YYYY-MM-DD
+        establishmentDate: newCompany.establishmentDate ? newCompany.establishmentDate : null, // Gửi YYYY-MM-DD hoặc null
+        UserAccountID: 1 // <-- Vẫn cần thay đổi giá trị 1 này sau
+      };
+
+      const createdCompany = await adminService.createCompany(companyDataForApi); // Gửi object đã ánh xạ
       setCompanies([...companies, createdCompany]);
       setShowAddModal(false);
-      setNewCompany({ name: '', industry: '', location: '', website: '', contactEmail: '', description: '' });
+      setNewCompany({ name: '', industry: '', location: '', website: '', contactEmail: '', description: '', establishmentDate: '' });
       setFormErrors({});
     } catch (error) {
       console.error('Error creating company:', error);
@@ -78,7 +102,19 @@ const CompanyManagementPage = () => {
     }
 
     try {
-      const updatedCompany = await adminService.updateCompany(editCompany.id, editCompany);
+      // Tạo object dữ liệu để gửi đến API, ánh xạ tên trường
+      const companyDataForApi = {
+        name: editCompany.name,
+        description: editCompany.description,
+        companyWebsite: editCompany.website,
+        companyEmail: editCompany.contactEmail,
+        // establishmentDate có thể cần định dạng lại tùy theo yêu cầu API PUT
+        establishmentDate: editCompany.establishmentDate ? editCompany.establishmentDate : null,
+        // API cập nhật thường không cần UserAccountID
+        // UserAccountID: editCompany.UserAccountID // Có thể bỏ qua nếu API không yêu cầu
+      };
+
+      const updatedCompany = await adminService.updateCompany(editCompany.id, companyDataForApi); // Gửi object đã ánh xạ
       setCompanies(companies.map(c => c.id === editCompany.id ? updatedCompany : c));
       setShowEditModal(false);
       setEditCompany(null);
@@ -110,12 +146,16 @@ const CompanyManagementPage = () => {
   };
 
   const openDeleteModal = (company) => {
-    setSelectedCompany(company);
+    setSelectedCompany({ ...company, id: company.ID });
     setShowDeleteModal(true);
   };
 
   const openEditModal = (company) => {
-    setEditCompany(company);
+    setEditCompany({
+      ...company,
+      id: company.ID,
+      establishmentDate: company.establishmentDate ? company.establishmentDate.split('T')[0] : ''
+    });
     setShowEditModal(true);
   };
 
@@ -258,6 +298,16 @@ const CompanyManagementPage = () => {
                 id="description"
                 name="description"
                 value={newCompany.description}
+                onChange={(e) => handleInputChange(e)}
+              />
+            </div>
+            <div className="form-group">
+              <label htmlFor="establishmentDate">Ngày thành lập</label>
+              <input
+                type="date"
+                id="establishmentDate"
+                name="establishmentDate"
+                value={newCompany.establishmentDate}
                 onChange={(e) => handleInputChange(e)}
               />
             </div>

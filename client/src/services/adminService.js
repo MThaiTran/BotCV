@@ -1,19 +1,12 @@
 // src/services/adminService.js
 import axios from 'axios';
 
-// Tạo instance axios với config mặc định
-const api = axios.create({
-  baseURL: '/api',
-  headers: {
-    'Content-Type': 'application/json'
-  },
-  withCredentials: true // Để gửi kèm cookies trong request
-});
+const API_URL = 'http://localhost:5000/api';
 
 export const adminService = {
   getAllUsers: async () => {
     try {
-      const response = await axios.get('/api/userAccount?page=1&limit=100', {
+      const response = await axios.get(`${API_URL}/userAccount?page=1&limit=100`, {
         headers: {
           'Content-Type': 'application/json'
         },
@@ -29,7 +22,7 @@ export const adminService = {
   
   updateUserStatus: async (userId, newStatus) => {
     try {
-      const response = await axios.put(`/api/userAccount/${userId}`, 
+      const response = await axios.put(`${API_URL}/userAccount/${userId}`, 
         { status: newStatus },
         {
           headers: {
@@ -47,7 +40,7 @@ export const adminService = {
   
   deleteUser: async (userId) => {
     try {
-      const response = await axios.delete(`/api/userAccount/${userId}`, {
+      const response = await axios.delete(`${API_URL}/userAccount/${userId}`, {
         headers: {
           'Content-Type': 'application/json'
         },
@@ -62,7 +55,7 @@ export const adminService = {
 
   updateUser: async (userId, userData) => {
     try {
-      const response = await axios.put(`/api/userAccount/${userId}`, 
+      const response = await axios.put(`${API_URL}/userAccount/${userId}`, 
         userData,
         {
           headers: {
@@ -80,12 +73,7 @@ export const adminService = {
 
   getAllJobs: async () => {
     try {
-      const response = await axios.get('/api/job?page=1&limit=100', {
-        headers: {
-          'Content-Type': 'application/json'
-        },
-        withCredentials: true
-      });
+      const response = await axios.get(`${API_URL}/job?page=1&limit=100`);
       console.log('Jobs data:', response.data.data);
       return response.data.data;
     } catch (error) {
@@ -96,7 +84,7 @@ export const adminService = {
   
   getJobById: async (id) => {
     try {
-      const response = await axios.get(`/api/job/${id}`, {
+      const response = await axios.get(`${API_URL}/job/${id}`, {
         headers: {
           'Content-Type': 'application/json'
         },
@@ -111,7 +99,7 @@ export const adminService = {
   
   updateJobStatus: async (id, status, reason = '') => {
     try {
-      const response = await axios.put(`/api/job/${id}`, 
+      const response = await axios.put(`${API_URL}/job/${id}`, 
         { status, rejectionReason: reason },
         {
           headers: {
@@ -129,7 +117,7 @@ export const adminService = {
   
   updateJob: async (id, jobData) => {
     try {
-      const response = await axios.put(`/api/job/${id}`, 
+      const response = await axios.put(`${API_URL}/job/${id}`, 
         jobData,
         {
           headers: {
@@ -147,7 +135,7 @@ export const adminService = {
   
   deleteJob: async (id) => {
     try {
-      const response = await axios.delete(`/api/job/${id}`, {
+      const response = await axios.delete(`${API_URL}/job/${id}`, {
         headers: {
           'Content-Type': 'application/json'
         },
@@ -162,15 +150,8 @@ export const adminService = {
 
   createJob: async (jobData) => {
     try {
-      const response = await axios.post('/api/job', 
-        jobData,
-        {
-          headers: {
-            'Content-Type': 'application/json'
-          },
-          withCredentials: true
-        }
-      );
+      const response = await axios.post(`${API_URL}/job`, jobData);
+      console.log(response.data);
       return response.data;
     } catch (error) {
       console.error('Error creating job:', error.response?.data || error.message);
@@ -195,7 +176,7 @@ export const adminService = {
 
   getAllCompanies: async () => {
     try {
-      const response = await axios.get('/api/company?page=1&limit=100', {
+      const response = await axios.get(`${API_URL}/company?page=1&limit=100`, {
         headers: {
           'Content-Type': 'application/json'
         },
@@ -211,8 +192,9 @@ export const adminService = {
 
   createCompany: async (companyData) => {
     try {
-      const response = await axios.post('/api/company', 
-        companyData,
+      const dataToSend = { ...companyData, UserAccountID: 1 };
+      const response = await axios.post(`${API_URL}/company`, 
+        dataToSend,
         {
           headers: {
             'Content-Type': 'application/json'
@@ -229,7 +211,7 @@ export const adminService = {
 
   updateCompany: async (id, companyData) => {
     try {
-      const response = await axios.put(`/api/company/${id}`, 
+      const response = await axios.put(`${API_URL}/company/${id}`, 
         companyData,
         {
           headers: {
@@ -247,7 +229,7 @@ export const adminService = {
 
   deleteCompany: async (id) => {
     try {
-      const response = await axios.delete(`/api/company/${id}`, {
+      const response = await axios.delete(`${API_URL}/company/${id}`, {
         headers: {
           'Content-Type': 'application/json'
         },
@@ -262,7 +244,7 @@ export const adminService = {
 
   updateCompanyStatus: async (id, status) => {
     try {
-      const response = await axios.put(`/api/company/${id}`, 
+      const response = await axios.put(`${API_URL}/company/${id}`, 
         { status },
         {
           headers: {

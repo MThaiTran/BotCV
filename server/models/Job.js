@@ -35,7 +35,8 @@ async function createJob(data) {
     .input('jobFromWork', data.jobFromWork || null)
     .input('jobHireNumber', data.jobHireNumber || null)
     .input('CompanyID', data.CompanyID)
-    .query(`INSERT INTO [Job] (name, jobExperience, salaryRange, expirationDate, jobDescription, jobLevel, jobEducation, jobFromWork, jobHireNumber, CompanyID) VALUES (@name, @jobExperience, @salaryRange, @expirationDate, @jobDescription, @jobLevel, @jobEducation, @jobFromWork, @jobHireNumber, @CompanyID)`);
+    .input('JobCategoryID', data.JobCategoryID)
+    .query(`INSERT INTO [Job] (name, jobExperience, salaryRange, expirationDate, jobDescription, jobLevel, jobEducation, jobFromWork, jobHireNumber, CompanyID, JobCategoryID) VALUES (@name, @jobExperience, @salaryRange, @expirationDate, @jobDescription, @jobLevel, @jobEducation, @jobFromWork, @jobHireNumber, @CompanyID, @JobCategoryID)`);
 }
 
 async function updateJob(id, data) {
@@ -52,7 +53,8 @@ async function updateJob(id, data) {
     .input('jobFromWork', data.jobFromWork || null)
     .input('jobHireNumber', data.jobHireNumber || null)
     .input('CompanyID', data.CompanyID)
-    .query(`UPDATE [Job] SET name = @name, jobExperience = @jobExperience, salaryRange = @salaryRange, expirationDate = @expirationDate, jobDescription = @jobDescription, jobLevel = @jobLevel, jobEducation = @jobEducation, jobFromWork = @jobFromWork, jobHireNumber = @jobHireNumber, CompanyID = @CompanyID WHERE ID = @ID`);
+    .input('JobCategoryID', data.JobCategoryID)
+    .query(`UPDATE [Job] SET name = @name, jobExp erience = @jobExperience, salaryRange = @salaryRange, expirationDate = @expirationDate, jobDescription = @jobDescription, jobLevel = @jobLevel, jobEducation = @jobEducation, jobFromWork = @jobFromWork, jobHireNumber = @jobHireNumber, CompanyID = @CompanyID WHERE ID = @ID`);
 }
 
 async function deleteJob(id) {
