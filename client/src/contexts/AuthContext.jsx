@@ -8,7 +8,7 @@ const mockUser = {
   fullName: "Nguyễn Văn A",
   password: "password",
   email: "nguyenvana@example.com",
-  role: "employer", // candidate | employer
+  role: "admin", // candidate | employer
   education: {
     school: "Đại học Bách Khoa Hà Nội",
     major: "Công nghệ thông tin"
