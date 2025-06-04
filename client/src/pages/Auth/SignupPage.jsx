@@ -256,7 +256,7 @@ const SignupPage = () => {
                 </Button>
 
                 <div className="form-footer">
-                  Đã có tài khoản? <Link to="/dang-nhap">Đăng nhập</Link>
+                  Đã có tài khoản? <Link to="/login">Đăng nhập</Link>
                 </div>
               </form>
             </div>

@@ -1,3 +1,4 @@
+// src/pages/JobDetailPage/JobDetailPage.jsx
 import React, { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
 import { jobService } from '../../services/jobService';
@@ -7,6 +8,8 @@ const JobDetailPage = () => {
   const { id } = useParams();
   const [job, setJob] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [applySuccess, setApplySuccess] = useState(false);
+  const [applyLoading, setApplyLoading] = useState(false);
 
   useEffect(() => {
     const loadData = async () => {
@@ -22,11 +25,23 @@ const JobDetailPage = () => {
     loadData();
   }, [id]);
 
+  const handleApply = async () => {
+    setApplyLoading(true);
+    try {
+      // Gọi API ứng tuyển ở đây, ví dụ:
+      // await jobService.applyJob(job.id, currentUser.id);
+      await new Promise(resolve => setTimeout(resolve, 1000)); // Giả lập delay
+      setApplySuccess(true);
+    } catch (error) {
+      alert('Ứng tuyển thất bại, vui lòng thử lại!');
+    } finally {
+      setApplyLoading(false);
+    }
+  };
+
   if (loading) return <div className="loading">Đang tải...</div>;
   if (!job) return <div className="error">Không tìm thấy việc làm</div>;
 
-  // Chuẩn hóa trường dữ liệu
-  // job.name (tên công việc), job.company.name, job.company.logo, job.salary.{min,max,currency}, job.location, job.description (html), job.requirements (html hoặc array), job.applicationUrl
   return (
     <div className="job-detail-container">
       <div className="job-header">
@@ -69,11 +84,21 @@ const JobDetailPage = () => {
         <div className="job-section">
           <h2>Yêu cầu</h2>
           <ul>
-            {job.jobLevel ? (<li>{job.jobLevel}</li>) : null}
-            {job.jobEducation ? (<li>{job.jobEducation}</li>) : null}
-            {job.jobFromwork ? (<li>{job.jobFromwork}</li>) : null}
-            {job.jobHireNumber ? (<li>{job.jobHireNumber}</li>) : null}
+            {job.jobLevel && <li><strong>Cấp bậc:</strong> {job.jobLevel}</li>}
+            {job.jobEducation && <li><strong>Học vấn:</strong> {job.jobEducation}</li>}
+            {job.jobFromWork && <li><strong>Hình thức làm việc:</strong> {job.jobFromWork}</li>}
+            {job.jobHireNumber && <li><strong>Số lượng tuyển:</strong> {job.jobHireNumber}</li>}
           </ul>
+          {/* Hiển thị thêm phần yêu cầu chi tiết nếu có */}
+          {job.requirements && (
+            Array.isArray(job.requirements) ? (
+              <ul>
+                {job.requirements.map((req, idx) => <li key={idx}>{req}</li>)}
+              </ul>
+            ) : (
+              <div dangerouslySetInnerHTML={{ __html: job.requirements }} />
+            )
+          )}
         </div>
 
         <div className="job-actions">
@@ -87,8 +112,12 @@ const JobDetailPage = () => {
               Ứng tuyển ngay
             </a>
           ) : (
-            <button className="apply-button" disabled>
-              Không thể ứng tuyển
+            <button
+              className="apply-button"
+              onClick={handleApply}
+              disabled={applyLoading || applySuccess}
+            >
+              {applySuccess ? 'Đã ứng tuyển' : applyLoading ? 'Đang gửi...' : 'Ứng tuyển ngay'}
             </button>
           )}
         </div>
