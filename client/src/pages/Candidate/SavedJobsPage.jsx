@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '../../contexts/AuthContext';
-import JobCard from '../../components/Job/JobCard';
+import SavedJobCard from '../../components/Job/SavedJobCard';
 import { savedJobsService } from '../../mock/savedJobs';
 import '../../assets/css/Pages/candidate/SavedJobsPage.css';
 import axios from 'axios';
@@ -49,10 +49,8 @@ const SavedJobsPage = () => {
         const filtered = response.data.data.filter(
           (app) => app.SeekerProfileID === seekerProfileId
         );
-        console.log("FRTTTTTT", filtered);
-        console.log("FRTTTTTT", response.data.data);
         setSavedJobs(filtered);
-        console.log('Fetched applications:', filtered);
+        console.log('Saved jobs fetched:', filtered);
       } catch (error) {
         console.error('Lỗi tải việc lưu', error);
       }
@@ -60,6 +58,8 @@ const SavedJobsPage = () => {
 
     if (currentUser?.ID) {
       fetchSavedJobs(currentUser.ID);
+
+      setLoading(false);
     } else {
       setSavedJobs([]);
       console.log('No current user found, clearing applications.');
@@ -85,16 +85,17 @@ const SavedJobsPage = () => {
         <div className="saved-jobs-list">
           {savedJobs.length > 0 ? (
             savedJobs.map(item => (
-              <JobCard 
-                key={item.Job.ID}
-                ID={item.Job.ID}
-                name={item.Job.name}
-                jobExperience={item.Job.jobExperience}
-                salaryRange={item.Job.salaryRange}
-                expirationDate={item.Job.expirationDate}
-                jobLevel={item.Job.jobLevel}
-                jobEducation={item.Job.jobEducation}
-                jobFromWork={item.Job.jobFromWork}
+              <SavedJobCard 
+                {...console.log('Rendering job card for:', item)}
+                key={item.ID}
+                ID={item.ID}
+                name={item.name}
+                jobExperience={item.jobExperience}
+                salaryRange={item.salaryRange}
+                expirationDate={item.expirationDate}
+                jobLevel={item.jobLevel}
+                jobEducation={item.jobEducation}
+                jobFromWork={item.jobFromWork}
                 onUnsave={() => handleUnsaveJob(item.id)}
                 isSaved={true}
               />
@@ -104,6 +105,7 @@ const SavedJobsPage = () => {
           )}
         </div>
       )}
+      {console.log('Loading...', loading)}
     </div>
   );
 };
