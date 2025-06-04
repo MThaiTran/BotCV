@@ -17,7 +17,7 @@ const ProfilePage = () => {
   useEffect(() => {
     if (currentUser) {
       setValue('fullName', currentUser.fullName || '');
-      setValue('email', currentUser.email || '');
+      setValue('emailContact', currentUser.emailContact || '');
       setValue('phoneNumber', currentUser.phoneNumber || '');
       setCvUrl(currentUser.cvUrl || '');
     }
@@ -28,7 +28,7 @@ const ProfilePage = () => {
     reset();
     if (currentUser) {
       setValue('fullName', currentUser.fullName || '');
-      setValue('email', currentUser.email || '');
+      setValue('emailContact', currentUser.emailContact || '');
       setValue('phoneNumber', currentUser.phoneNumber || '');
       setCvUrl(currentUser.cvUrl || '');
     }
@@ -38,7 +38,7 @@ const ProfilePage = () => {
     try {
       await updateProfile({
         fullName: data.fullName,
-        email: data.email,
+        emailContact: data.emailContact,
         phoneNumber: data.phoneNumber,
         cvUrl: cvUrl
       });
@@ -67,7 +67,7 @@ const ProfilePage = () => {
               <Input
                 label="Email"
                 type="email"
-                name="email"
+                name="emailContact"
                 register={register}
                 disabled
               />
@@ -86,7 +86,7 @@ const ProfilePage = () => {
               </div>
               <div className="profile-field">
                 <label>Email:</label>
-                <p>{currentUser?.email || 'Chưa cập nhật'}</p>
+                <p>{currentUser?.emailContact || 'Chưa cập nhật'}</p>
               </div>
               <div className="profile-field">
                 <label>Số điện thoại:</label>

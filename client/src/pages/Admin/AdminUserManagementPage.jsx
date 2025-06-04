@@ -13,17 +13,17 @@ const AdminUserManagementPage = () => {
   const [showAddModal, setShowAddModal] = useState(false);
   const [showEditModal, setShowEditModal] = useState(false);
   const [newUser, setNewUser] = useState({
-    name: '',
-    email: '',
+    fullName: '',
+    emailContact: '',
     password: '',
     role: 'candidate',
     profileImage: '',
     registrationDate: ''
   });
   const [editUser, setEditUser] = useState({
-    id: '',
-    name: '',
-    email: '',
+    ID: '',
+    fullName: '',
+    emailContact: '',
     role: '',
     status: '',
     company: {
@@ -57,7 +57,7 @@ const AdminUserManagementPage = () => {
       const newStatus = currentStatus === 'active' ? 'suspended' : 'active';
       await adminService.updateUserStatus(userId, newStatus);
       setUsers(users.map(user =>
-        user.id === userId ? { ...user, status: newStatus } : user
+        user.ID === userId ? { ...user, status: newStatus } : user
       ));
     } catch (error) {
       console.error('Error updating user status:', error);
@@ -67,7 +67,7 @@ const AdminUserManagementPage = () => {
   const handleDeleteUser = async (userId) => {
     try {
       await adminService.deleteUser(userId);
-      setUsers(users.filter(user => user.id !== userId));
+      setUsers(users.filter(user => user.ID !== userId));
       setShowDeleteModal(false);
     } catch (error) {
       console.error('Error deleting user:', error);
@@ -77,9 +77,9 @@ const AdminUserManagementPage = () => {
   const handleAddUser = async (e) => {
     e.preventDefault();
     const errors = {};
-    if (!newUser.name.trim()) errors.name = 'Tên không được để trống';
-    if (!newUser.email.trim()) errors.email = 'Email không được để trống';
-    if (!/\S+@\S+\.\S+/.test(newUser.email)) errors.email = 'Email không hợp lệ';
+    if (!newUser.fullName.trim()) errors.fullName = 'Tên không được để trống';
+    if (!newUser.emailContact.trim()) errors.emailContact = 'Email không được để trống';
+    if (!/\S+@\S+\.\S+/.test(newUser.emailContact)) errors.emailContact = 'Email không hợp lệ';
     if (!newUser.password) errors.password = 'Mật khẩu không được để trống';
     if (newUser.password.length < 6) errors.password = 'Mật khẩu phải có ít nhất 6 ký tự';
 
@@ -89,7 +89,7 @@ const AdminUserManagementPage = () => {
     }
 
     const userDataForApi = {
-      email: newUser.email,
+      email: newUser.emailContact,
       password: newUser.password,
       profileImage: newUser.profileImage,
       userType: newUser.role === 'employer' ? 'Employer' : 'Seeker',
@@ -101,8 +101,8 @@ const AdminUserManagementPage = () => {
       setUsers([...users, createdUser]);
       setShowAddModal(false);
       setNewUser({
-        name: '',
-        email: '',
+        fullName: '',
+        emailContact: '',
         password: '',
         role: 'candidate',
         profileImage: '',
@@ -122,9 +122,9 @@ const AdminUserManagementPage = () => {
   const handleEditUser = async (e) => {
     e.preventDefault();
     const errors = {};
-    if (!editUser.name.trim()) errors.name = 'Tên không được để trống';
-    if (!editUser.email.trim()) errors.email = 'Email không được để trống';
-    if (!/\S+@\S+\.\S+/.test(editUser.email)) errors.email = 'Email không hợp lệ';
+    if (!editUser.fullName.trim()) errors.fullName = 'Tên không được để trống';
+    if (!editUser.emailContact.trim()) errors.emailContact = 'Email không được để trống';
+    if (!/\S+@\S+\.\S+/.test(editUser.emailContact)) errors.emailContact = 'Email không hợp lệ';
     if (editUser.role === 'employer') {
       if (!editUser.company.name.trim()) errors['company.name'] = 'Tên công ty không được để trống';
       if (!editUser.company.address.trim()) errors['company.address'] = 'Địa chỉ không được để trống';
@@ -136,8 +136,8 @@ const AdminUserManagementPage = () => {
     }
 
     try {
-      const updatedUser = await adminService.updateUser(editUser.id, editUser);
-      setUsers(users.map(user => user.id === editUser.id ? updatedUser : user));
+      const updatedUser = await adminService.updateUser(editUser.ID, editUser);
+      setUsers(users.map(user => user.ID === editUser.ID ? updatedUser : user));
       setShowEditModal(false);
       setFormErrors({});
     } catch (error) {
@@ -186,14 +186,14 @@ const AdminUserManagementPage = () => {
   };
 
   const openDeleteModal = (user) => {
-    setSelectedUser({ ...user, id: user.ID });
+    setSelectedUser({ ...user, ID: user.ID });
     setShowDeleteModal(true);
   };
 
   const openEditModal = (user) => {
     const userWithCompany = {
       ...user,
-      id: user.ID,
+      ID: user.ID,
       company: user.company || {
         name: '',
         address: '',
@@ -207,8 +207,8 @@ const AdminUserManagementPage = () => {
   };
 
   const filteredUsers = users.filter(user => {
-    const matchesSearch = (user.name || '').toLowerCase().includes(searchTerm.toLowerCase()) ||
-      (user.email || '').toLowerCase().includes(searchTerm.toLowerCase());
+    const matchesSearch = (user.fullName || '').toLowerCase().includes(searchTerm.toLowerCase()) ||
+      (user.emailContact || '').toLowerCase().includes(searchTerm.toLowerCase());
     if (currentFilter === 'all') return matchesSearch;
     return matchesSearch && user.status === currentFilter;
   });
@@ -275,16 +275,16 @@ const AdminUserManagementPage = () => {
             </thead>
             <tbody>
               {filteredUsers.map(user => (
-                <tr key={user.id}>
-                  <td>{user.id}</td>
-                  <td>{user.name}</td>
-                  <td>{user.email}</td>
+                <tr key={user.ID}>
+                  <td>{user.ID}</td>
+                  <td>{user.fullName}</td>
+                  <td>{user.emailContact}</td>
                   <td>
                     <span className={`role-badge ${user.role}`}>
                       {user.role === 'employer' ? 'Nhà tuyển dụng' : 'Ứng viên'}
                     </span>
                   </td>
-                  <td>{user.createdAt ? new Date(user.createdAt).toLocaleDateString() : ''}</td>
+                  <td>{user.registrationDate ? new Date(user.registrationDate).toLocaleDateString() : ''}</td>
                   <td>
                     <span className={`status-badge ${user.status}`}>
                       {user.status === 'active' ? 'Đang hoạt động' : 'Đã khóa'}
@@ -299,7 +299,7 @@ const AdminUserManagementPage = () => {
                     </button>
                     <button
                       className={`status-toggle-btn ${user.status === 'active' ? 'suspend' : 'activate'}`}
-                      onClick={() => handleToggleStatus(user.id, user.status)}
+                      onClick={() => handleToggleStatus(user.ID, user.status)}
                     >
                       {user.status === 'active' ? 'Khóa' : 'Mở khóa'}
                     </button>
@@ -322,7 +322,7 @@ const AdminUserManagementPage = () => {
         <div className="modal-overlay">
           <div className="modal-container">
             <h2>Xác nhận xóa tài khoản</h2>
-            <p>Bạn có chắc chắn muốn xóa tài khoản của <strong>{selectedUser?.name}</strong>?</p>
+            <p>Bạn có chắc chắn muốn xóa tài khoản của <strong>{selectedUser?.fullName}</strong>?</p>
             <p className="warning-text">Hành động này không thể hoàn tác.</p>
             <div className="modal-actions">
               <button
@@ -333,7 +333,7 @@ const AdminUserManagementPage = () => {
               </button>
               <button
                 className="confirm-delete-btn"
-                onClick={() => handleDeleteUser(selectedUser.id)}
+                onClick={() => handleDeleteUser(selectedUser.ID)}
               >
                 Xóa tài khoản
               </button>
@@ -356,24 +356,24 @@ const AdminUserManagementPage = () => {
                 <input
                   type="text"
                   id="name"
-                  name="name"
-                  value={newUser.name}
+                  name="fullName"
+                  value={newUser.fullName}
                   onChange={handleInputChange}
-                  className={formErrors.name ? 'error' : ''}
+                  className={formErrors.fullName ? 'error' : ''}
                 />
-                {formErrors.name && <div className="error-message">{formErrors.name}</div>}
+                {formErrors.fullName && <div className="error-message">{formErrors.fullName}</div>}
               </div>
               <div className="form-group">
                 <label htmlFor="email">Email</label>
                 <input
                   type="email"
-                  id="email"
-                  name="email"
-                  value={newUser.email}
+                  id="emailContact"
+                  name="emailContact"
+                  value={newUser.emailContact}
                   onChange={handleInputChange}
-                  className={formErrors.email ? 'error' : ''}
+                  className={formErrors.emailContact ? 'error' : ''}
                 />
-                {formErrors.email && <div className="error-message">{formErrors.email}</div>}
+                {formErrors.emailContact && <div className="error-message">{formErrors.emailContact}</div>}
               </div>
               <div className="form-group">
                 <label htmlFor="password">Mật khẩu</label>
@@ -458,24 +458,24 @@ const AdminUserManagementPage = () => {
                   <input
                     type="text"
                     id="edit-name"
-                    name="name"
-                    value={editUser.name}
+                    name="fullName"
+                    value={editUser.fullName}
                     onChange={handleEditInputChange}
-                    className={formErrors.name ? 'error' : ''}
+                    className={formErrors.fullName ? 'error' : ''}
                   />
-                  {formErrors.name && <div className="error-message">{formErrors.name}</div>}
+                  {formErrors.fullName && <div className="error-message">{formErrors.fullName}</div>}
                 </div>
                 <div className="form-group">
                   <label htmlFor="edit-email">Email</label>
                   <input
                     type="email"
-                    id="edit-email"
-                    name="email"
-                    value={editUser.email}
+                    id="edit-emailContact"
+                    name="emailContact"
+                    value={editUser.emailContact}
                     onChange={handleEditInputChange}
-                    className={formErrors.email ? 'error' : ''}
+                    className={formErrors.emailContact ? 'error' : ''}
                   />
-                  {formErrors.email && <div className="error-message">{formErrors.email}</div>}
+                  {formErrors.emailContact && <div className="error-message">{formErrors.emailContact}</div>}
                 </div>
                 <div className="form-group">
                   <label htmlFor="edit-role">Loại tài khoản</label>

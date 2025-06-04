@@ -4,21 +4,20 @@ import React, { createContext, useContext, useState, useEffect } from 'react';
 
 // Mock user data
 const mockUser = {
-  id: "user123",
-  fullName: "Nguyễn Văn A",
-  password: "password",
-  email: "nguyenvana@example.com",
-  role: "admin", // candidate | employer
-  education: {
-    school: "Đại học Bách Khoa Hà Nội",
-    major: "Công nghệ thông tin"
+  ID: 1,
+  fullName: "Nguyen Van An",
+  phoneNumber: "0123456789",
+  emailContact: "nguyen.van.an@example.com",
+  UserAccountID: 1,
+  userAcc: {
+    ID: 1,
+    email: "nguyen.van.an@example.com",
+    password: "matkhau123",
+    profileImage: "http://localhost:5000/api/upload/fb.png",
+    userType: "Seeker",
+    registrationDate: "2025-01-01T00:00:00.000Z"
   },
-  experience: {
-    company: "Tech Solutions Vietnam",
-    position: "Frontend Developer"
-  },
-  cvUrl: "https://example.com/cv/nguyenvana.pdf",
-  createdAt: "2024-10-15"
+  cvUrl: "http://localhost:5000/api/upload/NguyenVanAn.pdf"
 };
 
 const AuthContext = createContext();

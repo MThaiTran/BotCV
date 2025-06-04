@@ -88,20 +88,20 @@ const Header = () => {
                     onClick={() => setShowDropdown(!showDropdown)}
                   >
                     <div className="user-avatar">
-                      {currentUser?.avatar ? (
-                        <img src={currentUser.avatar} alt="Avatar" />
+                      {currentUser?.userAcc?.profileImage ? (
+                        <img src={currentUser.userAcc.profileImage} alt="Avatar" />
                       ) : (
-                        <span>{currentUser?.name?.charAt(0) || 'U'}</span>
+                        <span>{currentUser?.fullName?.charAt(0) || 'U'}</span>
                       )}
                     </div>
-                    <span className="user-name">{currentUser?.name || 'Người dùng'}</span> {/* cần lấy tên user */}
+                    <span className="user-name">{currentUser?.fullName || 'Người dùng'}</span>
                     <i className={`dropdown-arrow ${showDropdown ? 'active' : ''}`}></i>
                   </button>
 
                   {showDropdown && (
                     <div className="dropdown-menu">
                       <div className="dropdown-header">
-                        <p className="user-email">{currentUser?.email}</p>
+                        <p className="user-email">{currentUser?.emailContact}</p>
                       </div>
                       
                       <ul className="dropdown-list">
