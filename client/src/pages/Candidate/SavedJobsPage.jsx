@@ -3,7 +3,6 @@ import { useAuth } from '../../contexts/AuthContext';
 import JobCard from '../../components/Job/JobCard';
 import { savedJobsService } from '../../mock/savedJobs';
 import '../../assets/css/Pages/candidate/SavedJobsPage.css';
-import axios from 'axios';
 
 const SavedJobsPage = () => {
   const { currentUser } = useAuth();
@@ -43,28 +42,19 @@ const SavedJobsPage = () => {
 
   
   useEffect(() => {
-    const fetchSavedJobs = async (seekerProfileId) => {
+    const fetchSavedJobs = async () => {
       try {
-        const response = await axios.get('/api/wishlistJob?page=1&limit=100');
-        const filtered = response.data.data.filter(
-          (app) => app.SeekerProfileID === seekerProfileId
-        );
-        console.log("FRTTTTTT", filtered);
-        console.log("FRTTTTTT", response.data.data);
-        setSavedJobs(filtered);
-        console.log('Fetched applications:', filtered);
+        setLoading(true);
+        console.log(currentUser.id);
+        const data = await savedJobsService.getSavedJobs(currentUser.id);
+        setSavedJobs(data);
       } catch (error) {
-        console.error('Lỗi tải việc lưu', error);
+        console.error('Lỗi tải việc đã lưu:', error);
+      } finally {
+        setLoading(false);
       }
     };
-
-    if (currentUser?.ID) {
-      fetchSavedJobs(currentUser.ID);
-    } else {
-      setSavedJobs([]);
-      console.log('No current user found, clearing applications.');
-    }
-
+    if (currentUser) fetchSavedJobs();
   }, [currentUser]);
 
   const handleUnsaveJob = async (wishlistId) => {
@@ -104,6 +94,7 @@ const SavedJobsPage = () => {
           )}
         </div>
       )}
+      {console.log('loading...', loading)}
     </div>
   );
 };
