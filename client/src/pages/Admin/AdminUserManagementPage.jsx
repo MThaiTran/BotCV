@@ -308,8 +308,9 @@ const AdminUserManagementPage = () => {
                   <td>{user.email}</td>
                   {/* Cột Loại tài khoản */}
                   <td>
-                    <span className={`role-badge ${user.role}`}>
-                      {user.role === 'employer' ? 'Nhà tuyển dụng' : 'Ứng viên'}
+                    {/* Hiển thị trực tiếp userType từ API */}
+                    <span className={`role-badge ${user.userType ? user.userType.toLowerCase() : 'unknown'}`}>
+                      {user.userType || 'Không xác định'}
                     </span>
                   </td>
                   {/* Cột Ngày đăng ký */}
