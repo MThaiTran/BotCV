@@ -25,6 +25,13 @@ const Header = () => {
     };
   }, []);
 
+  // Log user info an toàn hơn
+  useEffect(() => {
+    if (currentUser) {
+      console.log('User hiện tại:', currentUser);
+    }
+  }, [currentUser]);
+
   const handleLogout = async () => {
     try {
       await logout();
@@ -36,7 +43,6 @@ const Header = () => {
 
   return (
     <header className="header">
-    {console.log('User hiện tại :' + currentUser.name)}
       <div className="container">
         <div className="header-content">
           <div className="logo">
