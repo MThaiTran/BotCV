@@ -5,12 +5,16 @@ import { Link } from 'react-router-dom';
 import '../../assets/css/Components/JobCard.css';
 
 const JobCard = ({
-  id,
-  title,
+  ID,
+  name,
+  jobExperience,
+  salaryRange,
+  expirationDate,
+  jobLevel,
+  jobEducation,
+  jobFromWork,
   company,
   location,
-  salary,
-  type,
   postedAt,
   tags,
   isSaved,
@@ -20,27 +24,29 @@ const JobCard = ({
     <div className="job-card">
       <div className="job-card-header">
         <h2 className="job-title">
-          <Link to={`/jobs/${id}`}>{title}</Link>
+          <Link to={`/jobs/${ID}`}>{name}</Link>
         </h2>
         {company && <span className="company">{company}</span>}
       </div>
       <div className="job-card-body">
         <div className="job-meta">
           {location && <span>{location}</span>}
-          {salary &&
-            <span>
-              {typeof salary === 'object'
-                ? `${salary.min.toLocaleString()} - ${salary.max.toLocaleString()} ${salary.currency || 'VND'}`
-                : salary}
-            </span>
-          }
-          {type && <span>{type}</span>}
+          {salaryRange && <span>{salaryRange}</span>}
+          {jobFromWork && <span>{jobFromWork}</span>}
+          {jobExperience && <span>{jobExperience} kinh nghiệm</span>}
         </div>
         <div className="job-tags">
+          {jobLevel && <span className="tag">{jobLevel}</span>}
+          {jobEducation && <span className="tag">{jobEducation}</span>}
           {Array.isArray(tags) && tags.map((tag, idx) => (
             <span className="tag" key={idx}>{tag}</span>
           ))}
         </div>
+        {expirationDate && (
+          <div className="job-date">
+            Hết hạn {new Date(expirationDate).toLocaleDateString('vi-VN')}
+          </div>
+        )}
         {postedAt && (
           <div className="job-date">
             Đăng ngày {new Date(postedAt).toLocaleDateString('vi-VN')}
@@ -59,19 +65,16 @@ const JobCard = ({
 };
 
 JobCard.propTypes = {
-  id: PropTypes.oneOfType([PropTypes.string, PropTypes.number]).isRequired,
-  title: PropTypes.string.isRequired,
+  ID: PropTypes.oneOfType([PropTypes.string, PropTypes.number]).isRequired,
+  name: PropTypes.string.isRequired,
+  jobExperience: PropTypes.string,
+  salaryRange: PropTypes.string,
+  expirationDate: PropTypes.string,
+  jobLevel: PropTypes.string,
+  jobEducation: PropTypes.string,
+  jobFromWork: PropTypes.string,
   company: PropTypes.string,
   location: PropTypes.string,
-  salary: PropTypes.oneOfType([
-    PropTypes.string,
-    PropTypes.shape({
-      min: PropTypes.number,
-      max: PropTypes.number,
-      currency: PropTypes.string
-    })
-  ]),
-  type: PropTypes.string,
   postedAt: PropTypes.string,
   tags: PropTypes.arrayOf(PropTypes.string),
   isSaved: PropTypes.bool,
