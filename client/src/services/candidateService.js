@@ -85,5 +85,17 @@ export const candidateService = {
       console.error(`Error fetching candidates for company ${companyId}:`, error);
       throw error;
     }
-  }
+  },
+
+  // Function to fetch all companies (Restored inside candidateService)
+  getAllCompanies: async () => {
+    try {
+      const response = await axios.get(`${API_URL}/company?page=1&limit=100`);
+      console.log('Companies data:', response.data.data);
+      return response.data.data;
+    } catch (error) {
+      console.error('Error fetching all companies:', error);
+      throw error;
+    }
+  },
 };
