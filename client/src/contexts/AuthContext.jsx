@@ -1,24 +1,7 @@
 // 
 // src/contexts/AuthContext.js
 import React, { createContext, useContext, useState, useEffect } from 'react';
-
-// Mock user data
-const mockUser = {
-  ID: 1,
-  fullName: "Nguyen Van An",
-  phoneNumber: "0123456789",
-  emailContact: "nguyen.van.an@example.com",
-  UserAccountID: 1,
-  userAcc: {
-    ID: 1,
-    email: "nguyen.van.an@example.com",
-    password: "matkhau123",
-    profileImage: "http://localhost:5000/api/upload/fb.png",
-    userType: "Seeker",
-    registrationDate: "2025-01-01T00:00:00.000Z"
-  },
-  cvUrl: "http://localhost:5000/api/upload/NguyenVanAn.pdf"
-};
+import axios from 'axios';
 
 const AuthContext = createContext();
 
@@ -30,49 +13,78 @@ export const AuthProvider = ({ children }) => {
   const [currentUser, setCurrentUser] = useState(null);
   const [loading, setLoading] = useState(true);
 
-  // Giả lập việc tải thông tin người dùng khi component được mount
-  useEffect(() => {
-    // Giả lập API call để lấy thông tin người dùng
-    const fetchUser = async () => {
-      await new Promise(resolve => setTimeout(resolve, 1000)); // Giả lập delay
-      setCurrentUser(mockUser);
-      setLoading(false);
-    };
+  // Hàm lấy dữ liệu user thực tế
+  const fetchUserData = async (userAccountId) => {
+    setLoading(true);
+    try {
+      // 1. Lấy toàn bộ seekerProfile
+      const seekerProfilesRes = await axios.get('/api/seekerProfile');
+      const seekerProfiles = seekerProfilesRes.data.data;
 
-    fetchUser();
+      // 2. Tìm seekerProfile theo UserAccountID
+      const seekerProfile = seekerProfiles.find(profile => profile.UserAccountID === userAccountId);
+
+      if (!seekerProfile) throw new Error('Không tìm thấy seekerProfile phù hợp');
+      // console.log(seekerProfile);
+      // 3. Lấy userAcc
+      const userAccRes = await axios.get(`/api/userAccount/${userAccountId}`);
+      const userAcc = userAccRes.data.data;
+      // 4. Lấy cvUrl (có thể null)
+      let cvUrl = null;
+      try {
+        // Lấy toàn bộ danh sách CV
+        const cvListRes = await axios.get('/api/cv');
+        const cvList = cvListRes.data.data;
+        // Tìm CV có SeekerProfileID = seekerProfile.ID
+        const cv = cvList.find(item => item.SeekerProfileID === seekerProfile.ID);
+        cvUrl = cv ? cv.CVFilePath : null;
+      } catch (cvErr) {
+        cvUrl = null;
+      }
+      // 5. Gộp lại thành user object
+      const user = {
+        ...seekerProfile,
+        userAcc,
+        cvUrl
+      };
+      console.log(user);
+      setCurrentUser(user);
+    } catch (error) {
+      setCurrentUser(null);
+      console.error('Lỗi lấy dữ liệu user:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    // Ví dụ: lấy từ localStorage, query param, hoặc props
+    const userAccountId = Number(new URLSearchParams(window.location.search).get('userAccountId')) || 1;
+    fetchUserData(userAccountId);
   }, []);
 
   // Hàm cập nhật thông tin profile
   const updateProfile = async (profileData) => {
     // Giả lập API call để cập nhật thông tin
     await new Promise(resolve => setTimeout(resolve, 1000)); // Giả lập delay
-    
-    // Cập nhật state với dữ liệu mới
     setCurrentUser(prevUser => ({
       ...prevUser,
       ...profileData
     }));
-    
     return { success: true };
   };
 
   // Hàm đăng nhập (mock)
   const login = async (email, password) => {
-    // Giả lập API call đăng nhập
     await new Promise(resolve => setTimeout(resolve, 1000));
-    
-    if (email === "nguyenvana@example.com" && password === "password") {
-      setCurrentUser(mockUser);
-      // console.log("Đăng nhập thành công:", currentUser.role);
-      return mockUser; // Trả về thông tin người dùng đã đăng nhập
-    } else {
-      throw new Error("Email hoặc mật khẩu không đúng");
-    }
+    // Ví dụ: lấy userAccountId sau khi xác thực thành công
+    const userAccountId = 1; // Thay bằng id thực tế nếu có
+    await fetchUserData(userAccountId);
+    return currentUser;
   };
 
   // Hàm đăng xuất (mock)
   const logout = async () => {
-    // Giả lập API call đăng xuất
     await new Promise(resolve => setTimeout(resolve, 500));
     setCurrentUser(null);
     return { success: true };
