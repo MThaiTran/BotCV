@@ -70,10 +70,39 @@ const LoginPage = () => {
         user.email === formData.email && user.password === formData.password
       );
 
+      // 1. Lấy toàn bộ seekerProfile
+      const seekerProfilesRes = await axios.get('/api/seekerProfile');
+      const seekerProfiles = seekerProfilesRes.data.data;
+      // 2. Tìm seekerProfile theo UserAccountID
+      const seekerProfile = seekerProfiles.find(profile => profile.UserAccountID === foundUser.ID);
+
+      if (!seekerProfile) throw new Error('Không tìm thấy seekerProfile phù hợp');
+      // console.log(seekerProfile);
+      // 3. Lấy userAcc
+      // 4. Lấy cvUrl (có thể null)
+      let cvUrl = null;
+      try {
+        // Lấy toàn bộ danh sách CV
+        const cvListRes = await axios.get('/api/cv');
+        const cvList = cvListRes.data.data;
+        // Tìm CV có SeekerProfileID = seekerProfile.ID
+        const cv = cvList.find(item => item.SeekerProfileID === seekerProfile.ID);
+        cvUrl = cv ? cv.CVFilePath : null;
+      } catch (cvErr) {
+        cvUrl = null;
+      }
+      const userAcc = foundUser;
+      // 5. Gộp lại thành user object
+      const user = {
+        ...seekerProfile,
+        userAcc,
+        cvUrl
+      };
+      console.log("LOGGEDIN: ", user);
       // 3. Xử lý kết quả tìm kiếm
-      if (foundUser) {
+      if (user) {
         // Đăng nhập thành công: gọi hàm login từ context
-        await login(foundUser); // Truyền user object đã tìm thấy
+        await login(user); // Truyền user object đã tìm thấy
         
         // 4. Điều hướng dựa trên userType
         if (foundUser.userType === 'Admin') {

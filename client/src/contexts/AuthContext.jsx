@@ -28,7 +28,7 @@ export const AuthProvider = ({ children }) => {
       // console.log(seekerProfile);
       // 3. Lấy userAcc
       const userAccRes = await axios.get(`/api/userAccount/${userAccountId}`);
-      const userAcc = userAccRes.data.data;
+      const userAcc = userAccRes.data;
       // 4. Lấy cvUrl (có thể null)
       let cvUrl = null;
       try {
@@ -86,7 +86,7 @@ export const AuthProvider = ({ children }) => {
     console.log('Attempting to logout...');
     await new Promise(resolve => setTimeout(resolve, 500));
     setCurrentUser(null);
-    console.log('currentUser after logout:', null);
+    console.log('currentUser after logout:', currentUser);
     return { success: true };
   };
 

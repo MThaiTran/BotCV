@@ -75,7 +75,7 @@ const Header = () => {
               <li className="nav-item">
                 <Link to="/blog">Blog</Link>
               </li>
-              {isAuthenticated && currentUser?.role === 'employer' && (
+              {isAuthenticated && currentUser?.userAcc.userType === 'Company' && (
                 <li className="nav-item">
                   <Link to="/post-job">Đăng tuyển</Link>
                 </li>
@@ -108,7 +108,7 @@ const Header = () => {
                       </div>
                       
                       <ul className="dropdown-list">
-                        {currentUser?.role === 'candidate' && (
+                        {currentUser?.userAcc.userType === 'Seeker' && (
                           <>
                             <li>
                               <Link to={`/profile/${currentUser.id}`}>
@@ -130,7 +130,7 @@ const Header = () => {
                             </li>
                           </>
                         )}
-                        {currentUser?.role === 'employer' && (
+                        {currentUser?.userAcc.userType === 'Company' && (
                           <>
                             <li>
                               <Link to={`/company-profile`}>
