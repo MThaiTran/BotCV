@@ -18,7 +18,7 @@ const Header = () => {
         setShowDropdown(false);
       }
     };
-    console.log('User hiện tại :' + currentUser.fullName);
+    // console.log('User hiện tại :' + currentUser.fullName);
     document.addEventListener('mousedown', handleClickOutside);
     return () => {
       document.removeEventListener('mousedown', handleClickOutside);
@@ -28,18 +28,15 @@ const Header = () => {
   // Log user info an toàn hơn
   useEffect(() => {
     if (currentUser) {
-      console.log('User hiện tại:', currentUser);
+      // console.log('User hiện tại:', currentUser);
     }
   }, [currentUser]);
 
   const handleLogout = async () => {
-    console.log('Logout button clicked');
     try {
       await logout();
-      console.log('Logout successful');
       setShowDropdown(false);
       navigate('/');
-      console.log('Navigated to /');
     } catch (error) {
       console.error('Lỗi đăng xuất:', error);
     }
@@ -83,7 +80,6 @@ const Header = () => {
             </ul>
 
             <div className="auth-buttons">
-            {console.log('isAuthenticated :' + isAuthenticated)}
               {isAuthenticated ? (
                 <div className="user-menu" ref={dropdownRef}>
                   <button 
@@ -174,8 +170,8 @@ const Header = () => {
                 </div>
               ) : (
                 <>
-                  <Link to="/dang-nhap" className="btn btn-login">Đăng nhập</Link>
-                  <Link to="/dang-ky" className="btn btn-register">Đăng ký</Link>
+                  <Link to="/login" className="btn btn-login">Đăng nhập</Link>
+                  <Link to="/sign-up" className="btn btn-register">Đăng ký</Link>
                 </>
               )}
             </div>

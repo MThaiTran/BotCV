@@ -58,10 +58,18 @@ export const AuthProvider = ({ children }) => {
   };
 
   useEffect(() => {
-    // Ví dụ: lấy từ localStorage, query param, hoặc props
-    const userAccountId = Number(new URLSearchParams(window.location.search).get('userAccountId')) || 1;
-    fetchUserData(userAccountId);
-  }, []);
+  // Chỉ kiểm tra localStorage, không auto-fetch
+  const savedUser = localStorage.getItem('currentUser');
+  if (savedUser) {
+    try {
+      setCurrentUser(JSON.parse(savedUser));
+    } catch (error) {
+      console.error('Lỗi parse user từ localStorage:', error);
+    }
+  }
+  setLoading(false);
+}, []);
+
 
   // Hàm cập nhật thông tin profile
   const updateProfile = async (profileData) => {
@@ -83,10 +91,10 @@ export const AuthProvider = ({ children }) => {
 
   // Hàm đăng xuất (mock)
   const logout = async () => {
-    console.log('Attempting to logout...');
     await new Promise(resolve => setTimeout(resolve, 500));
+    localStorage.removeItem('user');
     setCurrentUser(null);
-    console.log('currentUser after logout:', currentUser);
+    console.log('User logged out successfully' + currentUser);
     return { success: true };
   };
 

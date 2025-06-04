@@ -29,9 +29,9 @@ export const router = createBrowserRouter([
     element: <App />,
     children: [
       { path: '/', element: <HomePage /> },
-      { path: '/dang-nhap', element: <LoginPage /> },
-      { path: '/dang-ky', element: <SignupPage /> },
-      { path: '/quen-mat-khau', element: <ForgotPasswordPage /> },
+      { path: '/login', element: <LoginPage /> },
+      { path: '/sign-up', element: <SignupPage /> },
+      { path: '/forgot', element: <ForgotPasswordPage /> },
       // Thêm các route khác ở đây
       // { path: '/dashboard', element: <ProtectedRoute><DashboardPage /></ProtectedRoute> }
       { path: '/jobs', element: <JobSearchPage />},

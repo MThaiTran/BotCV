@@ -67,7 +67,7 @@ const ForgotPasswordPage = () => {
     try {
       await resetPassword(token, password);
       setStep(4);
-      setTimeout(() => navigate('/dang-nhap'), 3000);
+      setTimeout(() => navigate('/login'), 3000);
     } catch (error) {
       alert(error.message);
     }
@@ -129,7 +129,7 @@ const ForgotPasswordPage = () => {
         )}
 
         <div className="nav-links">
-          <Link to="/dang-nhap">Quay lại Đăng nhập</Link>
+          <Link to="/login">Quay lại Đăng nhập</Link>
         </div>
       </div>
     </div>

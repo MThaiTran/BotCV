@@ -178,7 +178,7 @@ const LoginPage = () => {
                     />
                     <label htmlFor="rememberMe">Ghi nhớ đăng nhập</label>
                   </div>
-                  <Link to="/quen-mat-khau" className="forgot-password">
+                  <Link to="/forgot" className="forgot-password">
                     Quên mật khẩu?
                   </Link>
                 </div>
@@ -206,7 +206,7 @@ const LoginPage = () => {
                 </div>
 
                 <div className="form-footer">
-                  Chưa có tài khoản? <Link to="/dang-ky">Đăng ký ngay</Link>
+                  Chưa có tài khoản? <Link to="/sign-up">Đăng ký ngay</Link>
                 </div>
               </form>
             </div>
