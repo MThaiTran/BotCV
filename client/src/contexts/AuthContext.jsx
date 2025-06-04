@@ -8,6 +8,7 @@ const mockUser = {
   fullName: "Nguyễn Văn A",
   password: "password",
   email: "nguyenvana@example.com",
+  role: "admin", // candidate | employer
   education: {
     school: "Đại học Bách Khoa Hà Nội",
     major: "Công nghệ thông tin"
@@ -64,7 +65,8 @@ export const AuthProvider = ({ children }) => {
     
     if (email === "nguyenvana@example.com" && password === "password") {
       setCurrentUser(mockUser);
-      return { success: true };
+      // console.log("Đăng nhập thành công:", currentUser.role);
+      return mockUser; // Trả về thông tin người dùng đã đăng nhập
     } else {
       throw new Error("Email hoặc mật khẩu không đúng");
     }
@@ -81,6 +83,7 @@ export const AuthProvider = ({ children }) => {
   const value = {
     currentUser,
     loading,
+    isAuthenticated: !!currentUser ,
     login,
     logout,
     updateProfile

@@ -1,7 +1,7 @@
 PORT = 5000
 DB_USER = sa
 DB_PASS = 12345
-DB_SERVER = localhost\\LAPTOP-K8KRMS6N
+DB_SERVER = localhost
 DB_NAME = BotCV
 DB_PORT = 1433
 

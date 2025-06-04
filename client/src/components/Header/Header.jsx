@@ -18,7 +18,7 @@ const Header = () => {
         setShowDropdown(false);
       }
     };
-
+    console.log('User hiện tại :' + currentUser.fullName);
     document.addEventListener('mousedown', handleClickOutside);
     return () => {
       document.removeEventListener('mousedown', handleClickOutside);
@@ -28,6 +28,7 @@ const Header = () => {
   const handleLogout = async () => {
     try {
       await logout();
+      setShowDropdown(false);
       navigate('/');
     } catch (error) {
       console.error('Lỗi đăng xuất:', error);
@@ -36,7 +37,6 @@ const Header = () => {
 
   return (
     <header className="header">
-    {console.log('User hiện tại :' + currentUser.name)}
       <div className="container">
         <div className="header-content">
           <div className="logo">
@@ -73,6 +73,7 @@ const Header = () => {
             </ul>
 
             <div className="auth-buttons">
+            {console.log('isAuthenticated :' + isAuthenticated)}
               {isAuthenticated ? (
                 <div className="user-menu" ref={dropdownRef}>
                   <button 
@@ -97,15 +98,14 @@ const Header = () => {
                       </div>
                       
                       <ul className="dropdown-list">
-                        <li>
-                          <Link to="/profile">
-                            <i className="icon-profile"></i>
-                            Thông tin tài khoản
-                          </Link>
-                        </li>
-                        
                         {currentUser?.role === 'candidate' && (
                           <>
+                            <li>
+                              <Link to={`/profile/${currentUser.id}`}>
+                                <i className="icon-profile"></i>
+                                Thông tin tài khoản
+                              </Link>
+                            </li>
                             <li>
                               <Link to="/applications">
                                 <i className="icon-applications"></i>
@@ -122,6 +122,12 @@ const Header = () => {
                         )}
                         {currentUser?.role === 'employer' && (
                           <>
+                            <li>
+                              <Link to={`/company-profile`}>
+                                <i className="icon-profile"></i>
+                                Thông tin công ty
+                              </Link>
+                            </li>
                             <li>
                               <Link to="/manage-jobs">
                                 <i className="icon-jobs"></i>

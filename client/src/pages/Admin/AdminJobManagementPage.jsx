@@ -48,7 +48,7 @@ const AdminJobManagementPage = () => {
   const handleDeleteJob = async (jobId) => {
     try {
       await adminService.deleteJob(jobId);
-      setJobs(jobs.filter(job => job.ID !== jobId));
+      setJobs(jobs.filter(job => job.id !== jobId));
       setShowDeleteModal(false);
     } catch (error) {
       console.error('Error deleting job:', error);
@@ -112,7 +112,6 @@ const AdminJobManagementPage = () => {
     }
 
     try {
-      // Prepare data to match the API structure
       const jobData = {
         name: newJob.name,
         jobExperience: newJob.jobExperience,
@@ -125,15 +124,13 @@ const AdminJobManagementPage = () => {
         jobHireNumber: parseInt(newJob.jobHireNumber, 10),
         CompanyID: parseInt(newJob.CompanyID, 10),
         JobCategoryID: parseInt(newJob.JobCategoryID, 10),
-        // status: 'pending' // Set initial status as pending
       };
 
       const response = await adminService.createJob(jobData);
-      
+
       if (response && response.data) {
         setJobs([response.data, ...jobs]);
         setShowAddModal(false);
-        // Reset form
         setNewJob({
           name: '',
           jobExperience: '',
@@ -153,8 +150,8 @@ const AdminJobManagementPage = () => {
       }
     } catch (error) {
       console.error('Error creating job:', error);
-      setFormErrors({ 
-        general: error.response?.data?.message || 'Có lỗi xảy ra khi tạo tin tuyển dụng' 
+      setFormErrors({
+        general: error.response?.data?.message || 'Có lỗi xảy ra khi tạo tin tuyển dụng'
       });
     }
   };
@@ -176,7 +173,7 @@ const AdminJobManagementPage = () => {
   const filteredJobs = jobs.filter(job => {
     const matchesSearch =
       (job.name || '').toLowerCase().includes(searchTerm.toLowerCase()) ||
-      (job.company?.name || '').toLowerCase().includes(searchTerm.toLowerCase()); // Keep company search for now
+      (job.company?.name || '').toLowerCase().includes(searchTerm.toLowerCase());
     if (currentFilter === 'all') return matchesSearch;
     return matchesSearch && job.status === currentFilter;
   });
@@ -261,7 +258,7 @@ const AdminJobManagementPage = () => {
                   <td>{job.id}</td>
                   <td>{job.name}</td>
                   <td>{job.company?.name}</td>
-                  <td>{new Date(job.postedAt).toLocaleDateString()}</td>
+                  <td>{job.postedAt ? new Date(job.postedAt).toLocaleDateString() : ''}</td>
                   <td>
                     <span className={`status-badge ${job.status}`}>
                       {getStatusLabel(job.status)}
@@ -269,7 +266,7 @@ const AdminJobManagementPage = () => {
                   </td>
                   <td className="action-buttons">
                     <Link
-                      to={`/admin/jobs/${job.ID}`}
+                      to={`/admin/jobs/${job.id}`}
                       className="view-btn"
                     >
                       Xem
@@ -305,7 +302,6 @@ const AdminJobManagementPage = () => {
             <h2>Xác nhận xóa tin tuyển dụng</h2>
             <p>Bạn có chắc chắn muốn xóa tin tuyển dụng <strong>"{selectedJob?.name}"</strong>?</p>
             <p className="warning-text">Hành động này không thể hoàn tác.</p>
-
             <div className="modal-actions">
               <button
                 className="cancel-btn"
@@ -315,7 +311,7 @@ const AdminJobManagementPage = () => {
               </button>
               <button
                 className="confirm-delete-btn"
-                onClick={() => handleDeleteJob(selectedJob.ID)}
+                onClick={() => handleDeleteJob(selectedJob.id)}
               >
                 Xóa tin
               </button>
@@ -332,7 +328,7 @@ const AdminJobManagementPage = () => {
             <div className="job-review-info">
               <p><strong>Tiêu đề:</strong> {selectedJob?.name}</p>
               <p><strong>Công ty:</strong> {selectedJob?.company?.name}</p>
-              <p><strong>Ngày đăng:</strong> {new Date(selectedJob?.postedAt).toLocaleDateString()}</p>
+              <p><strong>Ngày đăng:</strong> {selectedJob?.postedAt ? new Date(selectedJob?.postedAt).toLocaleDateString() : ''}</p>
             </div>
 
             <div className="review-actions">
@@ -376,11 +372,9 @@ const AdminJobManagementPage = () => {
         <div className="modal-overlay">
           <div className="modal-container add-job-modal">
             <h2>Đăng tin tuyển dụng mới</h2>
-
             {formErrors.general && (
               <div className="error-message general-error">{formErrors.general}</div>
             )}
-
             <form onSubmit={handleAddJob}>
               <div className="form-group">
                 <label htmlFor="name">Tiêu đề công việc *</label>
@@ -394,7 +388,6 @@ const AdminJobManagementPage = () => {
                 />
                 {formErrors.name && <div className="error-message">{formErrors.name}</div>}
               </div>
-
               <div className="form-group">
                 <label htmlFor="jobExperience">Kinh nghiệm *</label>
                 <input
@@ -407,7 +400,6 @@ const AdminJobManagementPage = () => {
                 />
                 {formErrors.jobExperience && <div className="error-message">{formErrors.jobExperience}</div>}
               </div>
-
               <div className="form-group">
                 <label htmlFor="salaryRange">Mức lương *</label>
                 <input
@@ -420,7 +412,6 @@ const AdminJobManagementPage = () => {
                 />
                 {formErrors.salaryRange && <div className="error-message">{formErrors.salaryRange}</div>}
               </div>
-
               <div className="form-group">
                 <label htmlFor="expirationDate">Ngày hết hạn *</label>
                 <input
@@ -433,7 +424,6 @@ const AdminJobManagementPage = () => {
                 />
                 {formErrors.expirationDate && <div className="error-message">{formErrors.expirationDate}</div>}
               </div>
-
               <div className="form-group">
                 <label htmlFor="jobDescription">Mô tả công việc *</label>
                 <textarea
@@ -446,7 +436,6 @@ const AdminJobManagementPage = () => {
                 ></textarea>
                 {formErrors.jobDescription && <div className="error-message">{formErrors.jobDescription}</div>}
               </div>
-
               <div className="form-group">
                 <label htmlFor="jobLevel">Cấp bậc *</label>
                 <input
@@ -459,7 +448,6 @@ const AdminJobManagementPage = () => {
                 />
                 {formErrors.jobLevel && <div className="error-message">{formErrors.jobLevel}</div>}
               </div>
-
               <div className="form-group">
                 <label htmlFor="jobEducation">Học vấn *</label>
                 <input
@@ -472,7 +460,6 @@ const AdminJobManagementPage = () => {
                 />
                 {formErrors.jobEducation && <div className="error-message">{formErrors.jobEducation}</div>}
               </div>
-
               <div className="form-group">
                 <label htmlFor="jobFromWork">Hình thức làm việc *</label>
                 <input
@@ -485,7 +472,6 @@ const AdminJobManagementPage = () => {
                 />
                 {formErrors.jobFromWork && <div className="error-message">{formErrors.jobFromWork}</div>}
               </div>
-
               <div className="form-group">
                 <label htmlFor="jobHireNumber">Số lượng cần tuyển *</label>
                 <input
@@ -498,7 +484,6 @@ const AdminJobManagementPage = () => {
                 />
                 {formErrors.jobHireNumber && <div className="error-message">{formErrors.jobHireNumber}</div>}
               </div>
-
               <div className="form-group">
                 <label htmlFor="JobCategoryID">Danh mục công việc *</label>
                 <input
@@ -511,7 +496,6 @@ const AdminJobManagementPage = () => {
                 />
                 {formErrors.JobCategoryID && <div className="error-message">{formErrors.JobCategoryID}</div>}
               </div>
-
               <div className="form-group">
                 <label htmlFor="CompanyID">ID Công ty *</label>
                 <input
@@ -524,7 +508,6 @@ const AdminJobManagementPage = () => {
                 />
                 {formErrors.CompanyID && <div className="error-message">{formErrors.CompanyID}</div>}
               </div>
-
               <div className="modal-actions">
                 <button
                   type="button"
