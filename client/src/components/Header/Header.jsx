@@ -25,6 +25,13 @@ const Header = () => {
     };
   }, []);
 
+  // Log user info an toàn hơn
+  useEffect(() => {
+    if (currentUser) {
+      console.log('User hiện tại:', currentUser);
+    }
+  }, [currentUser]);
+
   const handleLogout = async () => {
     try {
       await logout();
