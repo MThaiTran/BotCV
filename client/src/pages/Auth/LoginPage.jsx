@@ -76,7 +76,14 @@ const LoginPage = () => {
       // 2. Tìm seekerProfile theo UserAccountID
       const seekerProfile = seekerProfiles.find(profile => profile.UserAccountID === foundUser.ID);
 
-      if (!seekerProfile) throw new Error('Không tìm thấy seekerProfile phù hợp');
+      let company = null;
+      if (!seekerProfile){
+        const CompanyRes = await axios.get('/api/company');
+        const Companies = CompanyRes.data.data;
+        // 2. Tìm Company theo UserAccountID
+        company = Companies.find(profile => profile.UserAccountID === foundUser.ID);
+        if(company == null) throw new Error('Không tìm thấy seekerProfile phù hợp');
+      } 
       // console.log(seekerProfile);
       // 3. Lấy userAcc
       // 4. Lấy cvUrl (có thể null)
