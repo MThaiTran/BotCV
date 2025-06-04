@@ -33,6 +33,7 @@ const JobSearchPage = () => {
     <div className="job-search-page">
       <h1>Tìm kiếm việc làm</h1>
       <JobFilter filters={filters} onFilterChange={setFilters} />
+      {console.log('Current jobs:', jobs)}
       {isLoading ? (
         <p>Đang tải kết quả...</p>
       ) : (
