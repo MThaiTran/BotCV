@@ -3,6 +3,7 @@ import { useAuth } from '../../contexts/AuthContext';
 import JobCard from '../../components/Job/JobCard';
 import { savedJobsService } from '../../mock/savedJobs';
 import '../../assets/css/Pages/candidate/SavedJobsPage.css';
+import axios from 'axios';
 
 const SavedJobsPage = () => {
   const { currentUser } = useAuth();
@@ -42,19 +43,28 @@ const SavedJobsPage = () => {
 
   
   useEffect(() => {
-    const fetchSavedJobs = async () => {
+    const fetchSavedJobs = async (seekerProfileId) => {
       try {
-        setLoading(true);
-        console.log(currentUser.id);
-        const data = await savedJobsService.getSavedJobs(currentUser.id);
-        setSavedJobs(data);
+        const response = await axios.get('/api/wishlistJob?page=1&limit=100');
+        const filtered = response.data.data.filter(
+          (app) => app.SeekerProfileID === seekerProfileId
+        );
+        console.log("FRTTTTTT", filtered);
+        console.log("FRTTTTTT", response.data.data);
+        setSavedJobs(filtered);
+        console.log('Fetched applications:', filtered);
       } catch (error) {
-        console.error('Lỗi tải việc đã lưu:', error);
-      } finally {
-        setLoading(false);
+        console.error('Lỗi tải việc lưu', error);
       }
     };
-    if (currentUser) fetchSavedJobs();
+
+    if (currentUser?.ID) {
+      fetchSavedJobs(currentUser.ID);
+    } else {
+      setSavedJobs([]);
+      console.log('No current user found, clearing applications.');
+    }
+
   }, [currentUser]);
 
   const handleUnsaveJob = async (wishlistId) => {
