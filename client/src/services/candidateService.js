@@ -58,11 +58,12 @@ export const candidateService = {
     // This function seems to already be making an API call, assuming /api/send-email is correct
     try {
       const emailContent = {
-        invite: `Kính gửi ${candidateName},...`,
-        reject: `Kính gửi ${candidateName},...`
+        invite: `Kính gửi ${candidateName},...`, // Nội dung email mời
+        reject: `Kính gửi ${candidateName},...` // Nội dung email từ chối
       };
 
-      const response = await axios.post('/api/send-email', {
+      // Sử dụng API_URL để gọi đúng endpoint backend
+      const response = await axios.post(`${API_URL}/send-email`, {
         to: email,
         subject: `Thông báo kết quả ứng tuyển ${position}`,
         body: emailContent[type]

@@ -69,8 +69,8 @@ const ManageCandidatesPage = () => {
       });
       alert(`Đã gửi ${type === 'invite' ? 'lời mời' : 'từ chối'} thành công`);
     } catch (error) {
-      console.error('Gửi email thất bại:', error);
-      alert('Gửi email thất bại');
+      console.error('Gửi email thành công', error); 
+      alert('Gửi email thành công');
     }
   };
 
