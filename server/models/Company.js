@@ -52,11 +52,66 @@ async function deleteCompany(id) {
   await pool.request().input('ID', sql.Int, id).query('DELETE FROM [Company] WHERE ID = @ID');
 }
 
+async function getCompanyCandidates(companyId) {
+  await poolConnect;
+  const result = await pool.request()
+    .input('CompanyID', sql.Int, companyId)
+    .query(`
+      SELECT 
+        aj.ID as appliedJobId,
+        aj.appliedDate,
+        j.ID as jobId,
+        sp.*
+      FROM Job j
+      INNER JOIN AppliedJob aj ON j.ID = aj.JobID
+      INNER JOIN SeekerProfile sp ON aj.SeekerProfileID = sp.ID
+      WHERE j.CompanyID = @CompanyID
+    `);
+  return result.recordset;
+}
+
+async function getCompanyJobs(companyId) {
+  await poolConnect;
+  const result = await pool.request()
+    .input('CompanyID', sql.Int, companyId)
+    .query(`
+      SELECT 
+        j.*,
+        c.name as CompanyName
+
+      FROM Job j
+      INNER JOIN Company c ON j.CompanyID = c.ID
+      WHERE j.CompanyID = @CompanyID
+    `);
+  return result.recordset;
+}
+
+async function getCompanyAppliedJobs(companyId) {
+  await poolConnect;
+  
+  const result = await pool.request()
+    .input('CompanyID', sql.Int, companyId)
+    .query(`
+      SELECT 
+        aj.ID,
+        aj.appliedDate,
+        j.ID as jobId
+      FROM AppliedJob aj
+      INNER JOIN Job j ON aj.JobID = j.ID
+      WHERE j.CompanyID = @CompanyID
+    `);
+
+  return result.recordset;
+}
+
 module.exports = {
   getAllCompanies,
   getCompanyWithPagination,
   getCompanyById,
   createCompany,
   updateCompany,
-  deleteCompany
+  deleteCompany,
+  getCompanyCandidates,
+  getCompanyJobs,
+  getCompanyAppliedJobs
 };

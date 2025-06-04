@@ -1,23 +1,15 @@
 const express = require('express');
 const router = express.Router();
-const upload = require('../middlewares/upload');
+const { upload, handleMulterError } = require('../middlewares/upload');
 const uploadController = require('../controllers/uploadController');
 
-// Route upload single image
-router.post('/', upload.single('image'), uploadController.uploadImage);
+// Route upload single file
+router.post('/single', upload.single('file'), handleMulterError, uploadController.uploadFile);
 
-// Route upload game image
-router.post('/game', upload.single('gameImage'), uploadController.uploadGameImage);
+// Route upload multiple files
+router.post('/multiple', upload.array('files', 10), handleMulterError, uploadController.uploadMultipleFiles);
 
-// Route upload folder with logo and screenshots
-router.post('/folder', upload.fields([
-    { name: 'logo', maxCount: 1 },
-    { name: 'sp1', maxCount: 1 },
-    { name: 'sp2', maxCount: 1 },
-    { name: 'sp3', maxCount: 1 },
-    { name: 'sp4', maxCount: 1 },
-    { name: 'sp5', maxCount: 1 },
-    { name: 'sp6', maxCount: 1 }
-]), uploadController.uploadFolderWithImages);
+// Route get file by filename
+router.get('/:filename', uploadController.getFile);
 
 module.exports = router; 

@@ -15,4 +15,8 @@ router.post('/', controller.create);
 router.put('/:id', controller.update);
 router.delete('/:id', controller.remove);
 
+router.get('/:id/candidates', controller.getCompanyCandidates);
+router.get('/:id/jobs', controller.getCompanyJobs);
+router.get('/:id/appliedJobs', controller.getCompanyAppliedJobs);
+
 module.exports = router;

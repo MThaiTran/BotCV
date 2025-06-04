@@ -1,4 +1,7 @@
 const Company = require('../models/Company');
+const AppliedJob = require('../models/AppliedJob');
+const SeekerProfile = require('../models/SeekerProfile');
+const Job = require('../models/Job');
 
 async function getAll(req, res) {
   try {
@@ -48,10 +51,64 @@ async function remove(req, res) {
   }
 }
 
+async function getCompanyCandidates(req, res) {
+  try {
+    const companyId = req.params.id;
+    const candidates = await Company.getCompanyCandidates(companyId);
+    res.status(200).json({
+      success: true,
+      data: candidates
+    });
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: 'Lỗi khi lấy danh sách ứng viên',
+      error: error.message
+    });
+  }
+}
+
+async function getCompanyJobs(req, res) {
+  try {
+    const companyId = req.params.id;
+    const jobs = await Company.getCompanyJobs(companyId);
+    res.status(200).json({
+      success: true,
+      data: jobs
+    });
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: 'Lỗi khi lấy danh sách công việc',
+      error: error.message
+    });
+  }
+}
+
+async function getCompanyAppliedJobs(req, res) {
+  try {
+    const companyId = req.params.id;
+    const appliedJobs = await Company.getCompanyAppliedJobs(companyId);
+    res.status(200).json({
+      success: true,
+      data: appliedJobs
+    });
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: 'Lỗi khi lấy danh sách ứng tuyển',
+      error: error.message
+    });
+  }
+}
+
 module.exports = {
   getAll,
   getById,
   create,
   update,
-  remove
+  remove,
+  getCompanyCandidates,
+  getCompanyJobs,
+  getCompanyAppliedJobs
 };

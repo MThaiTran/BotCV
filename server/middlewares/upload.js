@@ -2,45 +2,31 @@ const multer = require('multer');
 const path = require('path');
 const fs = require('fs');
 
+// Tạo thư mục uploads nếu chưa tồn tại
+const uploadDir = path.join(__dirname, '../uploads');
+if (!fs.existsSync(uploadDir)) {
+    fs.mkdirSync(uploadDir, { recursive: true });
+}
+
 // Cấu hình storage cho multer
 const storage = multer.diskStorage({
     destination: function (req, file, cb) {
-        // Tạo thư mục dựa trên folder name từ request
-        const folderName = req.body.folderName || 'default';
-        const uploadPath = path.join('frontend', 'assets', 'Images', folderName);
-        
-        // Tạo thư mục nếu chưa tồn tại
-        if (!fs.existsSync(uploadPath)) {
-            fs.mkdirSync(uploadPath, { recursive: true });
-        }
-        
-        cb(null, uploadPath);
+        cb(null, uploadDir);
     },
     filename: function (req, file, cb) {
-        // Sử dụng tên file cố định dựa trên fieldname
-        const fieldName = file.fieldname;
-        let fileName;
-        
-        if (fieldName === 'logo') {
-            fileName = 'Logo.png';
-        } else if (fieldName.startsWith('sp')) {
-            const spNumber = fieldName.replace('sp', '');
-            fileName = `Sp${spNumber}.png`;
-        } else {
-            fileName = file.originalname;
-        }
-        
-        cb(null, fileName);
+        // Tạo tên file: timestamp + tên gốc
+        const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
+        cb(null, uniqueSuffix + '-' + file.originalname);
     }
 });
 
 // Kiểm tra file type
 const fileFilter = (req, file, cb) => {
-    // Chỉ chấp nhận các file ảnh
-    if (file.mimetype.startsWith('image/')) {
+    // Chấp nhận ảnh và PDF
+    if (file.mimetype.startsWith('image/') || file.mimetype === 'application/pdf') {
         cb(null, true);
     } else {
-        cb(new Error('Không phải file ảnh!'), false);
+        cb(new Error('Chỉ chấp nhận file ảnh hoặc PDF!'), false);
     }
 };
 
@@ -53,4 +39,21 @@ const upload = multer({
     }
 });
 
-module.exports = upload; 
+// Error handling middleware
+const handleMulterError = (err, req, res, next) => {
+    if (err instanceof multer.MulterError) {
+        if (err.code === 'LIMIT_FILE_SIZE') {
+            return res.status(400).json({
+                success: false,
+                message: 'File quá lớn. Kích thước tối đa là 5MB'
+            });
+        }
+        return res.status(400).json({
+            success: false,
+            message: `Lỗi upload: ${err.message}`
+        });
+    }
+    next(err);
+};
+
+module.exports = { upload, handleMulterError }; 
