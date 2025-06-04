@@ -41,11 +41,29 @@ const CompanyManagementPage = () => {
     try {
       setIsLoading(true);
       const data = await adminService.getAllCompanies();
-      // Ánh xạ ID từ tên trường backend (giả định là ID) sang id (lowercase)
-      const companiesWithMappedId = data.map(company => ({ ...company, id: company.ID }));
-      setCompanies(companiesWithMappedId); // Set state với dữ liệu đã ánh xạ
+
+      // Ánh xạ dữ liệu từ cấu trúc API (Backend) sang cấu trúc Frontend mong muốn
+      const companiesWithMappedFields = data.map(company => ({
+        ...company, // Giữ lại tất cả các thuộc tính gốc từ API
+        id: company.ID || company.id, // Ánh xạ ID từ API (ID hoa hoặc id thường)
+        // Ánh xạ các trường cho các cột hiển thị:
+        name: company.name || company.companyName || 'N/A', // Ánh xạ tên công ty
+        industry: company.industry || company.sector || 'N/A', // Ánh xạ lĩnh vực (giả định industry hoặc sector)
+        location: company.location || company.address || 'N/A', // Ánh xạ địa điểm (giả định location hoặc address)
+        status: company.status || company.companyStatus || 'unknown', // Ánh xạ trạng thái (giả định status hoặc companyStatus)
+        // Thêm các ánh xạ khác nếu cần cho các trường khác được sử dụng trên giao diện (ví dụ: website, email liên hệ, v.v.)
+        website: company.website || company.companyWebsite || '',
+        contactEmail: company.contactEmail || company.companyEmail || '',
+        description: company.description || '',
+        establishmentDate: company.establishmentDate || null,
+        UserAccountID: company.UserAccountID || null, // Giữ lại UserAccountID nếu có
+      }));
+
+      setCompanies(companiesWithMappedFields); // Set state với dữ liệu đã ánh xạ
+
     } catch (error) {
       console.error('Error fetching companies:', error);
+      setCompanies([]); // Đảm bảo state là mảng rỗng khi lỗi
     } finally {
       setIsLoading(false);
     }
@@ -69,22 +87,37 @@ const CompanyManagementPage = () => {
       const companyDataForApi = {
         name: newCompany.name,
         description: newCompany.description,
-        // Ánh xạ tên trường từ state sang API
-        companyWebsite: newCompany.website, 
-        companyEmail: newCompany.contactEmail, // Ánh xạ contactEmail sang companyEmail
-        // Xử lý establishmentDate để gửi định dạng YYYY-MM-DD
-        establishmentDate: newCompany.establishmentDate ? newCompany.establishmentDate : null, // Gửi YYYY-MM-DD hoặc null
+        companyWebsite: newCompany.website,
+        companyEmail: newCompany.contactEmail,
+        establishmentDate: newCompany.establishmentDate ? newCompany.establishmentDate : null,
         UserAccountID: 1 // <-- Vẫn cần thay đổi giá trị 1 này sau
       };
 
-      const createdCompany = await adminService.createCompany(companyDataForApi); // Gửi object đã ánh xạ
-      setCompanies([...companies, createdCompany]);
-      setShowAddModal(false);
-      setNewCompany({ name: '', industry: '', location: '', website: '', contactEmail: '', description: '', establishmentDate: '' });
-      setFormErrors({});
+      const createdCompanyResponseData = await adminService.createCompany(companyDataForApi); // Lấy response.data
+
+      // Kiểm tra dữ liệu trả về. Nếu thành công (backend trả về object hoặc message),
+      // đóng modal, reset form, thông báo và fetch lại danh sách.
+      if (createdCompanyResponseData) {
+        // Có thể kiểm tra specific message hoặc ID nếu muốn chính xác hơn,
+        // nhưng tạm thời kiểm tra có dữ liệu trả về là coi như thành công.
+
+        alert('Công ty đã được tạo thành công!'); // Thông báo thành công
+        setShowAddModal(false); // Đóng modal
+        setNewCompany({ name: '', industry: '', location: '', website: '', contactEmail: '', description: '', establishmentDate: '' }); // Reset form
+        setFormErrors({});
+
+        // Fetch lại toàn bộ danh sách công ty để cập nhật bảng
+        fetchCompanies();
+
+      } else {
+         // Xử lý trường hợp responseData không hợp lệ (ví dụ: null, undefined)
+         throw new Error(createdCompanyResponseData?.message || 'Không nhận được phản hồi thành công từ server sau khi tạo công ty.');
+      }
+
     } catch (error) {
       console.error('Error creating company:', error);
-      setFormErrors({ general: 'Có lỗi xảy ra khi tạo công ty' });
+      setFormErrors({ general: error.response?.data?.message || error.message || 'Có lỗi xảy ra khi tạo công ty' });
+      // Không đóng modal để người dùng thấy lỗi
     }
   };
 
@@ -206,9 +239,9 @@ const CompanyManagementPage = () => {
             <tr>
               <th>ID</th>
               <th>Tên công ty</th>
-              <th>Lĩnh vực</th>
-              <th>Địa điểm</th>
-              <th>Trạng thái</th>
+              <th>Email liên hệ</th>
+              <th>Website</th>
+              <th>Ngày thành lập</th>
               <th>Thao tác</th>
             </tr>
           </thead>
@@ -217,9 +250,9 @@ const CompanyManagementPage = () => {
               <tr key={company.id}>
                 <td>{company.id}</td>
                 <td>{company.name}</td>
-                <td>{company.industry}</td>
-                <td>{company.location}</td>
-                <td>{company.status}</td>
+                <td>{company.contactEmail || 'N/A'}</td>
+                <td>{company.website || 'N/A'}</td>
+                <td>{company.establishmentDate ? new Date(company.establishmentDate).toLocaleDateString() : 'N/A'}</td>
                 <td>
                   <button onClick={() => openEditModal(company)}>Sửa</button>
                   {company.status === 'pending' && <button onClick={() => handleApproveCompany(company.id)}>Duyệt</button>}

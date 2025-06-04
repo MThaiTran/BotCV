@@ -15,7 +15,7 @@ export const candidateService = {
   getAllJobs: async () => {
     try {
       const response = await axios.get(`${API_URL}/job`); // Assuming /api/job endpoint
-      return response.data;
+      return response.data.data;
     } catch (error) {
       console.error('Error fetching all jobs:', error);
       throw error;
@@ -26,7 +26,7 @@ export const candidateService = {
   getAllAppliedJobs: async () => {
     try {
       const response = await axios.get(`${API_URL}/appliedJob`); // Assuming /api/appliedJob endpoint
-      return response.data;
+      return response.data.data;
     } catch (error) {
       console.error('Error fetching all applied jobs:', error);
       throw error;
@@ -37,7 +37,7 @@ export const candidateService = {
   getAllSeekerProfiles: async () => {
     try {
       const response = await axios.get(`${API_URL}/seekerProfile`); // Assuming /api/seekerProfile endpoint
-      return response.data;
+      return response.data.data;
     } catch (error) {
       console.error('Error fetching all seeker profiles:', error);
       throw error;
@@ -58,11 +58,12 @@ export const candidateService = {
     // This function seems to already be making an API call, assuming /api/send-email is correct
     try {
       const emailContent = {
-        invite: `Kính gửi ${candidateName},...`,
-        reject: `Kính gửi ${candidateName},...`
+        invite: `Kính gửi ${candidateName},...`, // Nội dung email mời
+        reject: `Kính gửi ${candidateName},...` // Nội dung email từ chối
       };
 
-      const response = await axios.post('/api/send-email', {
+      // Sử dụng API_URL để gọi đúng endpoint backend
+      const response = await axios.post(`${API_URL}/send-email`, {
         to: email,
         subject: `Thông báo kết quả ứng tuyển ${position}`,
         body: emailContent[type]
@@ -70,6 +71,18 @@ export const candidateService = {
       return response.data;
     } catch (error) {
       console.error('Error sending email:', error);
+      throw error;
+    }
+  },
+
+  // Hàm mới: Lấy danh sách ứng viên theo CompanyID
+  getCompanyCandidates: async (companyId) => {
+    try {
+      // API endpoint: GET /api/company/:id/candidates
+      const response = await axios.get(`${API_URL}/company/${companyId}/candidates`);
+      return response.data.data; // Giả định response có cấu trúc { data: [...] }
+    } catch (error) {
+      console.error(`Error fetching candidates for company ${companyId}:`, error);
       throw error;
     }
   }

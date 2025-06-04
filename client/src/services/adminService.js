@@ -190,6 +190,17 @@ export const adminService = {
     }
   },
 
+  getAllJobCategories: async () => {
+    try {
+      const response = await axios.get(`${API_URL}/jobCategory`);
+      console.log('Job Categories data:', response.data.data);
+      return response.data.data;
+    } catch (error) {
+      console.error('Error fetching job categories:', error.response?.data || error.message);
+      throw error;
+    }
+  },
+
   createCompany: async (companyData) => {
     try {
       const dataToSend = { ...companyData, UserAccountID: 1 };

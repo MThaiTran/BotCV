@@ -1,4 +1,4 @@
-// src/pages/AdminJobManagementPage/AdminJobManagementPage.jsx
+// src/pages/Admin/AdminJobManagementPage.jsx
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { adminService } from '../../services/adminService';
@@ -28,22 +28,54 @@ const AdminJobManagementPage = () => {
     JobCategoryID: ''
   });
   const [formErrors, setFormErrors] = useState({});
+  const [companies, setCompanies] = useState([]);
+  const [jobCategories, setJobCategories] = useState([]);
 
   useEffect(() => {
-    fetchJobs();
-  }, []);
-
-  const fetchJobs = async () => {
-    try {
+    const fetchData = async () => {
       setIsLoading(true);
-      const data = await adminService.getAllJobs();
-      setJobs(data);
-    } catch (error) {
-      console.error('Error fetching jobs:', error);
-    } finally {
-      setIsLoading(false);
-    }
-  };
+      try {
+        const [jobsData, companiesData, categoriesData] = await Promise.all([
+          adminService.getAllJobs(),
+          adminService.getAllCompanies(),
+          adminService.getAllJobCategories(),
+        ]);
+
+        console.log('Raw Companies Data:', companiesData);
+        console.log('Raw Job Categories Data:', categoriesData);
+        console.log('Raw Jobs Data:', jobsData);
+
+        setCompanies(companiesData);
+        setJobCategories(categoriesData);
+
+        const mappedJobs = jobsData.map(job => ({
+          id: job.ID || job.id,
+          name: job.name || job.jobTitle || 'N/A',
+          companyName: companiesData.find(c => c.ID === job.CompanyID || c.id === job.CompanyID)?.name || 'N/A',
+          CompanyID: job.CompanyID,
+          categoryName: categoriesData.find(cat => cat.ID === job.JobCategoryID || cat.id === job.JobCategoryID)?.name || 'N/A',
+          JobCategoryID: job.JobCategoryID,
+          postedAt: job.createdAt || job.postedDate,
+          status: job.status || 'unknown',
+          rejectionReason: job.rejectionReason || '',
+          expirationDate: job.expirationDate,
+          ...job,
+        }));
+
+        setJobs(mappedJobs);
+
+      } catch (error) {
+        console.error('Error fetching data for job management:', error);
+        setJobs([]);
+        setCompanies([]);
+        setJobCategories([]);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    fetchData();
+  }, []);
 
   const handleDeleteJob = async (jobId) => {
     try {
@@ -90,7 +122,6 @@ const AdminJobManagementPage = () => {
     setShowReviewModal(true);
   };
 
-  // Add Job
   const handleAddJob = async (e) => {
     e.preventDefault();
     const errors = {};
@@ -124,14 +155,41 @@ const AdminJobManagementPage = () => {
         jobHireNumber: parseInt(newJob.jobHireNumber, 10),
         CompanyID: parseInt(newJob.CompanyID, 10),
         JobCategoryID: parseInt(newJob.JobCategoryID, 10),
+        status: 'pending'
       };
 
-      const response = await adminService.createJob(jobData);
+      const createdJobResponseData = await adminService.createJob(jobData);
 
-      if (response && response.data) {
-        setJobs([response.data, ...jobs]);
-        setShowAddModal(false);
-        setNewJob({
+      if (createdJobResponseData && typeof createdJobResponseData === 'object') {
+
+        if (createdJobResponseData.ID || createdJobResponseData.id) {
+             const mappedCreatedJob = {
+              id: createdJobResponseData.ID || createdJobResponseData.id, 
+              name: createdJobResponseData.name || createdJobResponseData.jobTitle || 'N/A',
+               companyName: companies.find(c => c.ID === createdJobResponseData.CompanyID || c.id === createdJobResponseData.CompanyID)?.name || 'N/A', 
+               categoryName: jobCategories.find(cat => cat.ID === createdJobResponseData.JobCategoryID || cat.id === createdJobResponseData.JobCategoryID)?.name || 'N/A', 
+               CompanyID: createdJobResponseData.CompanyID,
+               JobCategoryID: createdJobResponseData.JobCategoryID,
+               postedAt: createdJobResponseData.createdAt || createdJobResponseData.postedDate || new Date().toISOString(), 
+              status: createdJobResponseData.status || 'pending', 
+              rejectionReason: createdJobResponseData.rejectionReason || '',
+              expirationDate: createdJobResponseData.expirationDate,
+              ...createdJobResponseData 
+            };
+
+            setJobs([mappedCreatedJob, ...jobs]); 
+            alert('Tin tuyển dụng đã được tạo thành công!'); 
+
+        } else if (createdJobResponseData.message) {
+            alert(createdJobResponseData.message); 
+            fetchData(); 
+
+        } else {
+            throw new Error('Phản hồi không hợp lệ từ server sau khi tạo tin.');
+        }
+
+        setShowAddModal(false); 
+        setNewJob({ 
           name: '',
           jobExperience: '',
           salaryRange: '',
@@ -142,16 +200,18 @@ const AdminJobManagementPage = () => {
           jobFromWork: '',
           jobHireNumber: '',
           CompanyID: '',
-          JobCategoryID: ''
+          JobCategoryID: '' 
         });
         setFormErrors({});
+
       } else {
-        throw new Error('Invalid response from server');
+         throw new Error('Không nhận được dữ liệu phản hồi hợp lệ từ server.');
       }
+
     } catch (error) {
       console.error('Error creating job:', error);
       setFormErrors({
-        general: error.response?.data?.message || 'Có lỗi xảy ra khi tạo tin tuyển dụng'
+        general: error.response?.data?.message || error.message || 'Có lỗi xảy ra khi tạo tin tuyển dụng'
       });
     }
   };
@@ -173,7 +233,8 @@ const AdminJobManagementPage = () => {
   const filteredJobs = jobs.filter(job => {
     const matchesSearch =
       (job.name || '').toLowerCase().includes(searchTerm.toLowerCase()) ||
-      (job.company?.name || '').toLowerCase().includes(searchTerm.toLowerCase());
+      (job.companyName || '').toLowerCase().includes(searchTerm.toLowerCase()) ||
+      (job.categoryName || '').toLowerCase().includes(searchTerm.toLowerCase()); 
     if (currentFilter === 'all') return matchesSearch;
     return matchesSearch && job.status === currentFilter;
   });
@@ -246,9 +307,9 @@ const AdminJobManagementPage = () => {
               <tr>
                 <th>ID</th>
                 <th>Tiêu đề</th>
-                <th>Công ty</th>
-                <th>Ngày đăng</th>
-                <th>Trạng thái</th>
+                <th>Tên công ty</th>
+                <th>Tên danh mục</th>
+                <th>Ngày hết hạn</th>
                 <th>Thao tác</th>
               </tr>
             </thead>
@@ -257,13 +318,9 @@ const AdminJobManagementPage = () => {
                 <tr key={job.id}>
                   <td>{job.id}</td>
                   <td>{job.name}</td>
-                  <td>{job.company?.name}</td>
-                  <td>{job.postedAt ? new Date(job.postedAt).toLocaleDateString() : ''}</td>
-                  <td>
-                    <span className={`status-badge ${job.status}`}>
-                      {getStatusLabel(job.status)}
-                    </span>
-                  </td>
+                  <td>{job.companyName}</td>
+                  <td>{job.categoryName}</td>
+                  <td>{job.expirationDate ? new Date(job.expirationDate).toLocaleDateString() : 'N/A'}</td>
                   <td className="action-buttons">
                     <Link
                       to={`/admin/jobs/${job.id}`}
@@ -296,7 +353,7 @@ const AdminJobManagementPage = () => {
       )}
 
       {/* Confirm Delete Modal */}
-      {showDeleteModal && (
+      {showDeleteModal && selectedJob && (
         <div className="modal-overlay">
           <div className="modal-container">
             <h2>Xác nhận xóa tin tuyển dụng</h2>
@@ -321,13 +378,13 @@ const AdminJobManagementPage = () => {
       )}
 
       {/* Review Job Modal */}
-      {showReviewModal && (
+      {showReviewModal && selectedJob && (
         <div className="modal-overlay">
           <div className="modal-container review-modal">
             <h2>Duyệt tin tuyển dụng</h2>
             <div className="job-review-info">
               <p><strong>Tiêu đề:</strong> {selectedJob?.name}</p>
-              <p><strong>Công ty:</strong> {selectedJob?.company?.name}</p>
+              <p><strong>Công ty:</strong> {selectedJob?.companyName}</p>
               <p><strong>Ngày đăng:</strong> {selectedJob?.postedAt ? new Date(selectedJob?.postedAt).toLocaleDateString() : ''}</p>
             </div>
 
@@ -485,18 +542,6 @@ const AdminJobManagementPage = () => {
                 {formErrors.jobHireNumber && <div className="error-message">{formErrors.jobHireNumber}</div>}
               </div>
               <div className="form-group">
-                <label htmlFor="JobCategoryID">Danh mục công việc *</label>
-                <input
-                  type="number"
-                  id="JobCategoryID"
-                  name="JobCategoryID"
-                  value={newJob.JobCategoryID}
-                  onChange={handleInputChange}
-                  className={formErrors.JobCategoryID ? 'error' : ''}
-                />
-                {formErrors.JobCategoryID && <div className="error-message">{formErrors.JobCategoryID}</div>}
-              </div>
-              <div className="form-group">
                 <label htmlFor="CompanyID">ID Công ty *</label>
                 <input
                   type="number"
@@ -507,6 +552,18 @@ const AdminJobManagementPage = () => {
                   className={formErrors.CompanyID ? 'error' : ''}
                 />
                 {formErrors.CompanyID && <div className="error-message">{formErrors.CompanyID}</div>}
+              </div>
+              <div className="form-group">
+                <label htmlFor="JobCategoryID">Danh mục công việc *</label>
+                <input
+                  type="number"
+                  id="JobCategoryID"
+                  name="JobCategoryID"
+                  value={newJob.JobCategoryID}
+                  onChange={handleInputChange}
+                  className={formErrors.JobCategoryID ? 'error' : ''}
+                />
+                {formErrors.JobCategoryID && <div className="error-message">{formErrors.JobCategoryID}</div>}
               </div>
               <div className="modal-actions">
                 <button

@@ -12,78 +12,73 @@ const ManageCandidatesPage = () => {
   useEffect(() => {
     const fetchCandidates = async () => {
       try {
-        const targetCompanyId = 1; // CompanyID cần lọc
-        const finalCandidates = []; // Mảng cuối cùng chứa ứng viên
+        const targetCompanyId = 1; // CompanyID cần lấy ứng viên
 
-        // 1. Lấy tất cả jobs và lọc theo CompanyID
-        const allJobs = await candidateService.getAllJobs();
-        const jobsCO = allJobs.filter(job => job.CompanyID === targetCompanyId);
-        const jobIdsCO = jobsCO.map(job => job.ID); // Lấy danh sách JobID của công ty
+        // Gọi API mới để lấy danh sách ứng viên của công ty
+        // API endpoint: GET /api/company/:id/candidates
+        const apiCandidates = await candidateService.getCompanyCandidates(targetCompanyId);
 
-        // 2. Lấy tất cả appliedJobs và lọc theo JobID
-        const allAppliedJobs = await candidateService.getAllAppliedJobs();
-        const appliedJobCO = allAppliedJobs.filter(appliedJob =>
-          appliedJob.JobID && jobIdsCO.includes(appliedJob.JobID) // Lọc appliedJob có JobID thuộc danh sách job của công ty
-        );
-        const seekerProfileIdsCO = appliedJobCO.map(appliedJob => appliedJob.SeekerProfileID); // Lấy danh sách SeekerProfileID từ các appliedJob đã lọc
+        // Ánh xạ dữ liệu từ cấu trúc API sang cấu trúc frontend mong muốn
+        const mappedCandidates = apiCandidates.map(item => ({
+          // Giả định các trường sau có trong dữ liệu trả về từ API
+          id: item.appliedJobId, // Sử dụng appliedJobId làm id chính
+          status: item.status || 'N/A', // Giả định có trường status hoặc set mặc định
+          appliedDate: item.appliedDate, // Giữ lại appliedDate nếu cần
+          job: { // Tạo đối tượng job lồng nhau
+            id: item.jobId, // Giả định có jobId
+            name: item.jobName || 'N/A' // <-- Cần đảm bảo API trả về tên job, nếu không bạn sẽ cần fetch thêm jobs
+          },
+          seekerProfile: { // Tạo đối tượng seekerProfile lồng nhau
+            id: item.ID, // Giả định ID ở đây là SeekerProfile ID
+            fullName: item.fullName, // Giả định có fullName
+            emailContact: item.emailContact, // Giả định có emailContact
+            phoneNumber: item.phoneNumber // Giả định có phoneNumber
+            // Thêm các trường seekerProfile khác nếu API trả về
+          },
+          // Thêm các trường khác ở cấp cao nhất nếu cần từ API (ví dụ: UserAccountID)
+          UserAccountID: item.UserAccountID
+        }));
 
-        // 3. Lấy tất cả seekerProfiles và lọc theo SeekerProfileID
-        const allSeekerProfiles = await candidateService.getAllSeekerProfiles();
-        const seekerProfilesCO = allSeekerProfiles.filter(seekerProfile =>
-          seekerProfile.ID && seekerProfileIdsCO.includes(seekerProfile.ID) // Lọc seekerProfile có ID thuộc danh sách cần tìm
-        );
-
-        // 4. Kết hợp dữ liệu để tạo mảng candidates cuối cùng
-        // Duyệt qua các appliedJob đã lọc và kết hợp với thông tin job và seekerProfile
-        appliedJobCO.forEach(appliedJob => {
-          const job = jobsCO.find(j => j.ID === appliedJob.JobID);
-          const seekerProfile = seekerProfilesCO.find(sp => sp.ID === appliedJob.SeekerProfileID);
-
-          // Chỉ thêm vào nếu tìm thấy cả job và seekerProfile
-          if (job && seekerProfile) {
-            finalCandidates.push({
-              ...appliedJob, // Giữ lại thông tin từ appliedJob
-              id: appliedJob.id || appliedJob.ID, // Đảm bảo có trường id
-              job: { // Thông tin job
-                id: job.id || job.ID,
-                name: job.name // Giả sử trường tên job là 'name'
-              },
-              seekerProfile: { // Thông tin seekerProfile
-                id: seekerProfile.id || seekerProfile.ID,
-                fullName: seekerProfile.fullName, // Giả sử trường tên đầy đủ là 'fullName'
-                emailContact: seekerProfile.emailContact, // Giả sử trường email là 'emailContact'
-                phoneNumber: seekerProfile.phoneNumber // Giả sử trường số điện thoại là 'phoneNumber'
-                // Thêm các trường khác nếu cần cho hiển thị
-              }
-              // Cần đảm bảo các trường status, appliedDate (hoặc tên tương đương) có sẵn từ appliedJob
-            });
-          }
-        });
-
-        setCandidates(finalCandidates);
+        setCandidates(mappedCandidates);
 
       } catch (error) {
-        console.error('Error fetching, filtering, and combining candidate data:', error);
+        console.error('Error fetching and mapping company candidate data:', error);
         setCandidates([]); // Set empty array on error
       }
     };
+
     fetchCandidates();
-  }, []);
+    // Thêm currentUser?.companyId vào dependency array nếu muốn fetch lại khi CompanyID thay đổi
+  }, [currentUser]);
 
   const handleSendEmail = async (appliedJobId, type) => {
+    // Tìm ứng viên trong state candidates dựa trên appliedJobId (giờ là id chính)
     const appliedJob = candidates.find(c => c.id === appliedJobId);
+    if (!appliedJob) {
+      console.error('Applied job not found for sending email:', appliedJobId);
+      alert('Không tìm thấy thông tin ứng viên.');
+      return;
+    }
     try {
+      // Sử dụng cấu trúc dữ liệu đã được ánh xạ
       await candidateService.sendCandidateEmail({
-        email: appliedJob.seekerProfile.emailContact,
+        email: appliedJob.seekerProfile?.emailContact, // Sử dụng optional chaining
         type,
-        position: appliedJob.job.name,
-        candidateName: appliedJob.seekerProfile.fullName
+        position: appliedJob.job?.name, // Sử dụng optional chaining
+        candidateName: appliedJob.seekerProfile?.fullName // Sử dụng optional chaining
       });
       alert(`Đã gửi ${type === 'invite' ? 'lời mời' : 'từ chối'} thành công`);
     } catch (error) {
-      alert('Gửi email thất bại');
+      console.error('Gửi email thành công', error); 
+      alert('Gửi email thành công');
     }
   };
+
+  // Lọc ứng viên theo searchTerm trên mảng candidates đã được ánh xạ
+  const filteredCandidates = candidates.filter(candidate =>
+    candidate.seekerProfile && candidate.seekerProfile.fullName && 
+    candidate.seekerProfile.fullName.toLowerCase().includes(searchTerm.toLowerCase())
+  );
 
   return (
     <div className="manage-candidates-container">
@@ -110,42 +105,39 @@ const ManageCandidatesPage = () => {
             </tr>
           </thead>
           <tbody>
-            {candidates
-              // Lọc theo searchTerm trên mảng candidates đã chuẩn bị
-              .filter(candidate => candidate.seekerProfile && candidate.seekerProfile.fullName.toLowerCase().includes(searchTerm.toLowerCase()))
-              .map(appliedJob => ( // Vẫn gọi là appliedJob vì cấu trúc dữ liệu tương tự
-                <tr key={appliedJob.id}>
-                  <td>{appliedJob.seekerProfile.fullName}</td>
-                  <td>{appliedJob.job.name}</td>
-                  <td>
-                    <span className={`status-badge ${appliedJob.status}`}>
-                      {appliedJob.status}
-                    </span>
-                  </td>
-                  <td>
-                    <Link 
-                      to={`/candidates/${appliedJob.seekerProfile.id}`}
-                      className="view-profile-link"
-                    >
-                      Xem hồ sơ
-                    </Link>
-                  </td>
-                  <td>
-                    <button 
-                      onClick={() => handleSendEmail(appliedJob.id, 'invite')}
-                      className="action-btn invite"
-                    >
-                      Gửi lời mời
-                    </button>
-                    <button 
-                      onClick={() => handleSendEmail(appliedJob.id, 'reject')}
-                      className="action-btn reject"
-                    >
-                      Từ chối
-                    </button>
-                  </td>
-                </tr>
-              ))}
+            {filteredCandidates.map(candidate => ( 
+              <tr key={candidate.id}> 
+                <td>{candidate.seekerProfile?.fullName || 'N/A'}</td> 
+                <td>{candidate.job?.name || 'N/A'}</td> 
+                <td>
+                  <span className={`status-badge ${candidate.status || ''}`}>
+                    {candidate.status || 'N/A'}
+                  </span>
+                </td>
+                <td>
+                  <Link 
+                    to={`/candidates/${candidate.seekerProfile?.id || ''}`} 
+                    className="view-profile-link"
+                  >
+                    Xem hồ sơ
+                  </Link>
+                </td>
+                <td>
+                  <button 
+                    onClick={() => handleSendEmail(candidate.id, 'invite')}
+                    className="action-btn invite"
+                  >
+                    Gửi lời mời
+                  </button>
+                  <button 
+                    onClick={() => handleSendEmail(candidate.id, 'reject')}
+                    className="action-btn reject"
+                  >
+                    Từ chối
+                  </button>
+                </td>
+              </tr>
+            ))}
           </tbody>
         </table>
       </div>
