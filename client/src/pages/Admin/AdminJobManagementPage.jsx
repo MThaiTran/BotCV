@@ -53,7 +53,7 @@ const AdminJobManagementPage = () => {
           name: job.name || job.jobTitle || 'N/A',
           companyName: companiesData.find(c => c.ID === job.CompanyID || c.id === job.CompanyID)?.name || 'N/A',
           CompanyID: job.CompanyID,
-          categoryName: categoriesData.find(cat => cat.ID === job.JobCategoryID || cat.id === job.JobCategoryID)?.name || 'N/A',
+          categoryName: categoriesData.find(cat => cat.ID === job.JobCategoryID || cat.id === job.JobCategoryID)?.categoryName || 'N/A',
           JobCategoryID: job.JobCategoryID,
           postedAt: job.createdAt || job.postedDate,
           status: job.status || 'unknown',
