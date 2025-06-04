@@ -85,6 +85,7 @@ export const AuthProvider = ({ children }) => {
   // Hàm đăng nhập (sửa để nhận user object)
   const login = async (authenticatedUser) => {
     await new Promise(resolve => setTimeout(resolve, 1000)); // Giả lập delay API
+    localStorage.setItem('currentUser', JSON.stringify(authenticatedUser));
     setCurrentUser(authenticatedUser); // Set user đã xác thực
     return authenticatedUser; // Trả về thông tin người dùng đã đăng nhập
   };
@@ -92,7 +93,7 @@ export const AuthProvider = ({ children }) => {
   // Hàm đăng xuất (mock)
   const logout = async () => {
     await new Promise(resolve => setTimeout(resolve, 500));
-    localStorage.removeItem('user');
+    localStorage.removeItem('currentUser');
     setCurrentUser(null);
     console.log('User logged out successfully' + currentUser);
     return { success: true };

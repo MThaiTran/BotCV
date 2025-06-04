@@ -3,9 +3,12 @@ import React, { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
 import { jobService } from '../../services/jobService';
 import '../../assets/css/Pages/Job/JobDetailPage.css';
+import { useAuth } from '../../contexts/AuthContext';
+import axios from 'axios';
 
 const JobDetailPage = () => {
   const { id } = useParams();
+  const { currentUser } = useAuth();
   const [job, setJob] = useState(null);
   const [loading, setLoading] = useState(true);
   const [applySuccess, setApplySuccess] = useState(false);
@@ -28,11 +31,26 @@ const JobDetailPage = () => {
   const handleApply = async () => {
     setApplyLoading(true);
     try {
-      // Gọi API ứng tuyển ở đây, ví dụ:
-      // await jobService.applyJob(job.id, currentUser.id);
-      await new Promise(resolve => setTimeout(resolve, 1000)); // Giả lập delay
+      const currentDate = new Date().toISOString();
+      const seekerProfileID = currentUser?.ID;
+
+      if (!seekerProfileID) {
+        alert('Vui lòng đăng nhập để ứng tuyển!');
+        return;
+      }
+
+      const applyData = {
+        appliedDate: currentDate,
+        SeekerProfileID: seekerProfileID,
+        JobID: Number(id)
+      };
+
+      const response = await axios.post('/api/appliedJob', applyData);
+      console.log('Apply API response:', response.data);
+
       setApplySuccess(true);
     } catch (error) {
+      console.error('Error applying for job:', error);
       alert('Ứng tuyển thất bại, vui lòng thử lại!');
     } finally {
       setApplyLoading(false);
@@ -85,7 +103,7 @@ const JobDetailPage = () => {
           <h2>Yêu cầu</h2>
           <ul>
             {job.jobLevel && <li><strong>Cấp bậc:</strong> {job.jobLevel}</li>}
-            {job.jobEducation && <li><strong>Học vấn:</strong> {job.jobEducation}</li>}
+{job.jobEducation && <li><strong>Học vấn:</strong> {job.jobEducation}</li>}
             {job.jobFromWork && <li><strong>Hình thức làm việc:</strong> {job.jobFromWork}</li>}
             {job.jobHireNumber && <li><strong>Số lượng tuyển:</strong> {job.jobHireNumber}</li>}
           </ul>

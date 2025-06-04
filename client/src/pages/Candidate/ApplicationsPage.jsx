@@ -9,48 +9,33 @@ import mockApplications from '../../mock/applications';
 const FIXED_SEEKER_PROFILE_ID = 1;
 
 const ApplicationsPage = () => {
-  // const { currentUser } = useAuth();
-  // const [applications, setApplications] = useState([]);
-
-  // useEffect(() => {
-  //   const fetchApplications = async () => {
-  //     try {
-  //       const response = await fetch(`/api/users/${currentUser.id}/applications`);
-  //       const data = await response.json();
-  //       setApplications(data);
-  //     } catch (error) {
-  //       console.error('Lỗi tải ứng tuyển:', error);
-  //     }
-  //   };
-    
-  //   if (currentUser) {
-  //     fetchApplications();
-  //   }
-  // }, [currentUser]);
-
+  const { currentUser } = useAuth();
   const [applications, setApplications] = useState([]);
 
   useEffect(() => {
-    // Giả lập fetch API
-    // setTimeout(() => {
-    //   setApplications(mockApplications);
-    // }, 300);
-    const fetchApplications = async () => {
+    const fetchApplications = async (seekerProfileId) => {
       try {
-        const response = await axios.get('/api/appliedJob');
+        const response = await axios.get('/api/appliedJob?page=1&limit=100');
         const filtered = response.data.data.filter(
-          (app) => app.SeekerProfileID === FIXED_SEEKER_PROFILE_ID
+          (app) => app.SeekerProfileID === seekerProfileId
         );
+        console.log("FRTTTTTT", filtered);
+        console.log("FRTTTTTT", response.data.data);
         setApplications(filtered);
-        console.log(response.data.data);
-        // setApplications(response.data.data);
+        console.log('Fetched applications:', filtered);
       } catch (error) {
         console.error('Lỗi tải ứng tuyển:', error);
       }
     };
 
-    fetchApplications();
-  }, []);
+    if (currentUser?.ID) {
+      fetchApplications(currentUser.ID);
+    } else {
+      setApplications([]);
+      console.log('No current user found, clearing applications.');
+    }
+
+  }, [currentUser]);
 
   return (
     <div className="applications-page">
