@@ -18,8 +18,7 @@ const ApplicationCard = ({ application}) => {
       <div className="application-header">
         <h3>
           <Link to={`/jobs/${application.JobID}`} className="job-title-link">
-            {application.JobID}
-            {/* {application.job.name} */}
+            {application.jobName || 'Tên công việc không xác định'}
           </Link>
         </h3>
         <span className="status-badge" style={{ backgroundColor: status.color }}>
@@ -27,8 +26,8 @@ const ApplicationCard = ({ application}) => {
         </span>
       </div>
       <div className="application-details">
-        <p><strong>Công ty:</strong> {application.JobID}</p>
-        <p><strong>Ngày ứng tuyển:</strong> {new Date(application.appliedDate).toLocaleDateString()}</p>
+        <p><strong>Công ty:</strong> {application.companyName || 'Tên công ty không xác định'}</p>
+        <p><strong>Ngày ứng tuyển:</strong> {application.appliedDate ? new Date(application.appliedDate).toLocaleDateString() : 'N/A'}</p>
       </div>
       <div className="application-actions">
         {application.cvFilePath && (
@@ -51,13 +50,9 @@ ApplicationCard.propTypes = {
     ID: PropTypes.oneOfType([PropTypes.string, PropTypes.number]).isRequired,
     appliedDate: PropTypes.string.isRequired,
     status: PropTypes.string.isRequired,
-    job: PropTypes.shape({
-      ID: PropTypes.oneOfType([PropTypes.string, PropTypes.number]).isRequired,
-      name: PropTypes.string.isRequired,
-      company: PropTypes.shape({
-        name: PropTypes.string.isRequired,
-      }).isRequired,
-    }).isRequired,
+    JobID: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
+    jobName: PropTypes.string,
+    companyName: PropTypes.string,
     cvFilePath: PropTypes.string
   }).isRequired
 };
