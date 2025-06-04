@@ -18,10 +18,7 @@ const ProfilePage = () => {
     if (currentUser) {
       setValue('fullName', currentUser.fullName || '');
       setValue('email', currentUser.email || '');
-      setValue('education.school', currentUser.education?.school || '');
-      setValue('education.major', currentUser.education?.major || '');
-      setValue('experience.company', currentUser.experience?.company || '');
-      setValue('experience.position', currentUser.experience?.position || '');
+      setValue('phoneNumber', currentUser.phoneNumber || '');
       setCvUrl(currentUser.cvUrl || '');
     }
   }, [currentUser, setValue]);
@@ -29,13 +26,21 @@ const ProfilePage = () => {
   const handleCancel = () => {
     setIsEditing(false);
     reset();
+    if (currentUser) {
+      setValue('fullName', currentUser.fullName || '');
+      setValue('email', currentUser.email || '');
+      setValue('phoneNumber', currentUser.phoneNumber || '');
+      setCvUrl(currentUser.cvUrl || '');
+    }
   };
 
   const onSubmit = async (data) => {
     try {
       await updateProfile({
-        ...data,
-        cvUrl
+        fullName: data.fullName,
+        email: data.email,
+        phoneNumber: data.phoneNumber,
+        cvUrl: cvUrl
       });
       setIsEditing(false);
     } catch (error) {
@@ -66,6 +71,12 @@ const ProfilePage = () => {
                 register={register}
                 disabled
               />
+              <Input
+                label="Số điện thoại"
+                type="tel"
+                name="phoneNumber"
+                register={register}
+              />
             </>
           ) : (
             <>
@@ -77,65 +88,9 @@ const ProfilePage = () => {
                 <label>Email:</label>
                 <p>{currentUser?.email || 'Chưa cập nhật'}</p>
               </div>
-            </>
-          )}
-        </div>
-
-        {/* Học vấn */}
-        <div className="profile-section">
-          <h2>Học vấn</h2>
-          {isEditing ? (
-            <>
-              <Input
-                label="Trường Đại học"
-                name="education.school"
-                register={register}
-              />
-              <Input
-                label="Chuyên ngành"
-                name="education.major"
-                register={register}
-              />
-            </>
-          ) : (
-            <>
               <div className="profile-field">
-                <label>Trường:</label>
-                <p>{currentUser?.education?.school || 'Chưa cập nhật'}</p>
-              </div>
-              <div className="profile-field">
-                <label>Chuyên ngành:</label>
-                <p>{currentUser?.education?.major || 'Chưa cập nhật'}</p>
-              </div>
-            </>
-          )}
-        </div>
-
-        {/* Kinh nghiệm */}
-        <div className="profile-section">
-          <h2>Kinh nghiệm làm việc</h2>
-          {isEditing ? (
-            <>
-              <Input
-                label="Công ty"
-                name="experience.company"
-                register={register}
-              />
-              <Input
-                label="Vị trí"
-                name="experience.position"
-                register={register}
-              />
-            </>
-          ) : (
-            <>
-              <div className="profile-field">
-                <label>Công ty:</label>
-                <p>{currentUser?.experience?.company || 'Chưa cập nhật'}</p>
-              </div>
-              <div className="profile-field">
-                <label>Vị trí:</label>
-                <p>{currentUser?.experience?.position || 'Chưa cập nhật'}</p>
+                <label>Số điện thoại:</label>
+                <p>{currentUser?.phoneNumber || 'Chưa cập nhật'}</p>
               </div>
             </>
           )}
@@ -173,9 +128,11 @@ const ProfilePage = () => {
               </Button>
             </>
           ) : (
-            <Button type="button" variant="primary" onClick={() => setIsEditing(true)}>
-              Chỉnh sửa hồ sơ
-            </Button>
+            currentUser && (
+              <Button type="button" variant="primary" onClick={() => setIsEditing(true)}>
+                Chỉnh sửa hồ sơ
+              </Button>
+            )
           )}
         </div>
       </form>
