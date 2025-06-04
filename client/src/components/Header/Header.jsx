@@ -33,10 +33,13 @@ const Header = () => {
   }, [currentUser]);
 
   const handleLogout = async () => {
+    console.log('Logout button clicked');
     try {
       await logout();
+      console.log('Logout successful');
       setShowDropdown(false);
       navigate('/');
+      console.log('Navigated to /');
     } catch (error) {
       console.error('Lỗi đăng xuất:', error);
     }

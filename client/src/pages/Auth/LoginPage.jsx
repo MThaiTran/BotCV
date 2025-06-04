@@ -4,6 +4,7 @@ import '../../assets/css/Pages/Auth/LoginPage.css';
 import Input from '../../components/Input';
 import Button from '../../components/Button';
 import { useAuth } from '../../contexts/AuthContext';
+import axios from 'axios';
 
 const LoginPage = () => {
   const [formData, setFormData] = useState({
@@ -57,17 +58,42 @@ const LoginPage = () => {
 
     try {
       setIsLoading(true);
-      // Giả sử login trả về user object
-      const user = await login(formData.email, formData.password, formData.rememberMe);
-      if (user && user.role === 'admin') {
-        navigate('/admin/dashboard');
+
+      // 1. Gọi API GET /api/userAccount
+      const response = await axios.get('/api/userAccount');
+      const userAccounts = response.data.data; // Giả định API trả về { data: [...] }
+
+      // 2. Tìm tài khoản khớp với email và password
+      // Lưu ý: So sánh mật khẩu trực tiếp như thế này KHÔNG AN TOÀN trong ứng dụng thực tế.
+      // Mật khẩu nên được hash và so sánh ở backend.
+      const foundUser = userAccounts.find(user => 
+        user.email === formData.email && user.password === formData.password
+      );
+
+      // 3. Xử lý kết quả tìm kiếm
+      if (foundUser) {
+        // Đăng nhập thành công: gọi hàm login từ context
+        await login(foundUser); // Truyền user object đã tìm thấy
+        
+        // 4. Điều hướng dựa trên userType
+        if (foundUser.userType === 'Admin') {
+          navigate('/admin/dashboard');
+        } else {
+          navigate('/');
+        }
       } else {
-        navigate('/');
+        // Không tìm thấy tài khoản: hiển thị lỗi
+        setErrors({
+          ...errors,
+          general: 'Email hoặc mật khẩu không chính xác',
+        });
       }
+
     } catch (error) {
+      console.error('Login error:', error);
       setErrors({
         ...errors,
-        general: 'Email hoặc mật khẩu không chính xác',
+        general: 'Đã xảy ra lỗi trong quá trình đăng nhập.',
       });
     } finally {
       setIsLoading(false);

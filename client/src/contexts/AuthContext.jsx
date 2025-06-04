@@ -74,19 +74,19 @@ export const AuthProvider = ({ children }) => {
     return { success: true };
   };
 
-  // Hàm đăng nhập (mock)
-  const login = async (email, password) => {
-    await new Promise(resolve => setTimeout(resolve, 1000));
-    // Ví dụ: lấy userAccountId sau khi xác thực thành công
-    const userAccountId = 1; // Thay bằng id thực tế nếu có
-    await fetchUserData(userAccountId);
-    return currentUser;
+  // Hàm đăng nhập (sửa để nhận user object)
+  const login = async (authenticatedUser) => {
+    await new Promise(resolve => setTimeout(resolve, 1000)); // Giả lập delay API
+    setCurrentUser(authenticatedUser); // Set user đã xác thực
+    return authenticatedUser; // Trả về thông tin người dùng đã đăng nhập
   };
 
   // Hàm đăng xuất (mock)
   const logout = async () => {
+    console.log('Attempting to logout...');
     await new Promise(resolve => setTimeout(resolve, 500));
     setCurrentUser(null);
+    console.log('currentUser after logout:', null);
     return { success: true };
   };
 
