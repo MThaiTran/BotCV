@@ -1,4 +1,4 @@
-// src/pages/AdminUserManagementPage/AdminUserManagementPage.jsx
+// src/pages/Admin/AdminUserManagementPage.jsx
 import React, { useState, useEffect } from 'react';
 import { adminService } from '../../services/adminService';
 import '../../assets/css/Pages/Admin/AdminUserManagementPage.css';
@@ -44,9 +44,27 @@ const AdminUserManagementPage = () => {
     try {
       setIsLoading(true);
       const data = await adminService.getAllUsers();
-      setUsers(data);
+
+      // Log dữ liệu thô để kiểm tra cấu trúc API
+      console.log('Raw Users Data:', data);
+
+      // Ánh xạ dữ liệu từ cấu trúc API sang cấu trúc frontend mong muốn
+      const mappedUsers = data.map(user => ({
+        id: user.ID || user.id, // Ánh xạ ID từ API (hỗ trợ cả ID và id)
+        name: user.fullName || user.name || user.email || 'N/A', // Ánh xạ tên (ưu tiên fullName, sau đó name, cuối cùng email nếu không có tên nào)
+        email: user.email || 'N/A', // Ánh xạ email
+        role: user.userType === 'Employer' ? 'employer' : 'candidate', // Ánh xạ userType sang role
+        createdAt: user.registrationDate || user.createdAt || 'N/A', // Ánh xạ ngày đăng ký (hỗ trợ registrationDate và createdAt)
+        status: user.status || 'unknown', // Ánh xạ trạng thái (mặc định 'unknown' nếu không có)
+        // Giữ lại các thuộc tính khác nếu có và cần dùng
+        ...user
+      }));
+
+      setUsers(mappedUsers);
+
     } catch (error) {
       console.error('Error fetching users:', error);
+      setUsers([]);
     } finally {
       setIsLoading(false);
     }
@@ -194,6 +212,7 @@ const AdminUserManagementPage = () => {
     const userWithCompany = {
       ...user,
       id: user.ID,
+      name: user.fullName || user.name || '',
       company: user.company || {
         name: '',
         address: '',
@@ -265,7 +284,6 @@ const AdminUserManagementPage = () => {
             <thead>
               <tr>
                 <th>ID</th>
-                <th>Tên</th>
                 <th>Email</th>
                 <th>Loại tài khoản</th>
                 <th>Ngày đăng ký</th>
@@ -277,7 +295,6 @@ const AdminUserManagementPage = () => {
               {filteredUsers.map(user => (
                 <tr key={user.id}>
                   <td>{user.id}</td>
-                  <td>{user.name}</td>
                   <td>{user.email}</td>
                   <td>
                     <span className={`role-badge ${user.role}`}>
