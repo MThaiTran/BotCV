@@ -66,3 +66,48 @@
 .apply-button:hover {
   background: #38a169;
 }
+.action-buttons {
+  display: flex;
+  gap: 1rem;
+  margin-top: 2rem;
+}
+
+.save-button {
+  display: inline-block;
+  background: #fff;
+  color: #3182ce;
+  padding: 1rem 2rem;
+  border: 2px solid #3182ce;
+  border-radius: 6px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s;
+  outline: none;
+}
+
+.save-button:hover {
+  background: #3182ce;
+  color: #fff;
+}
+
+.save-button.saved {
+  background: #3182ce;
+  color: #fff;
+}
+
+.save-button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+@media (max-width: 768px) {
+  .action-buttons {
+    flex-direction: column;
+  }
+  
+  .apply-button,
+  .save-button {
+    width: 100%;
+    text-align: center;
+  }
+}

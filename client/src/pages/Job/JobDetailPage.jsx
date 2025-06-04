@@ -13,12 +13,19 @@ const JobDetailPage = () => {
   const [loading, setLoading] = useState(true);
   const [applySuccess, setApplySuccess] = useState(false);
   const [applyLoading, setApplyLoading] = useState(false);
+  const [isSaved, setIsSaved] = useState(false);
+  const [saveLoading, setSaveLoading] = useState(false);
 
   useEffect(() => {
     const loadData = async () => {
       try {
         const data = await jobService.getJobDetails(id);
         setJob(data);
+        
+        // Kiểm tra xem job đã được lưu chưa
+        if (currentUser?.ID) {
+          checkIfJobSaved();
+        }
       } catch (error) {
         console.error('Error loading job details:', error);
       } finally {
@@ -26,7 +33,24 @@ const JobDetailPage = () => {
       }
     };
     loadData();
-  }, [id]);
+  }, [id, currentUser]);
+
+  const checkIfJobSaved = async () => {
+    try {
+      // Lấy danh sách wishlist jobs
+      const response = await axios.get('/api/wishlistJob');
+      const wishlistJobs = response.data.data;
+      
+      // Kiểm tra xem job hiện tại có trong wishlist không
+      const savedJob = wishlistJobs.find(
+        item => item.SeekerProfileID === currentUser.ID && item.JobID === Number(id)
+      );
+      
+      setIsSaved(!!savedJob);
+    } catch (error) {
+      console.error('Error checking saved job:', error);
+    }
+  };
 
   const handleApply = async () => {
     setApplyLoading(true);
@@ -54,6 +78,46 @@ const JobDetailPage = () => {
       alert('Ứng tuyển thất bại, vui lòng thử lại!');
     } finally {
       setApplyLoading(false);
+    }
+  };
+
+  const handleSaveJob = async () => {
+    if (!currentUser?.ID) {
+      alert('Vui lòng đăng nhập để lưu công việc!');
+      return;
+    }
+
+    setSaveLoading(true);
+    try {
+      if (isSaved) {
+        // Bỏ lưu công việc - tìm và xóa wishlist item
+        const response = await axios.get('/api/wishlistJob');
+        const wishlistJobs = response.data.data;
+        
+        const savedJob = wishlistJobs.find(
+          item => item.SeekerProfileID === currentUser.ID && item.JobID === Number(id)
+        );
+        
+        if (savedJob) {
+          await axios.delete(`/api/wishlistJob/${savedJob.ID}`);
+          setIsSaved(false);
+        }
+      } else {
+        // Lưu công việc
+        const saveData = {
+          addedDate: new Date().toISOString(),
+          SeekerProfileID: currentUser.ID,
+          JobID: Number(id)
+        };
+        
+        await axios.post('/api/wishlistJob', saveData);
+        setIsSaved(true);
+      }
+    } catch (error) {
+      console.error('Error saving/unsaving job:', error);
+      alert('Có lỗi xảy ra, vui lòng thử lại!');
+    } finally {
+      setSaveLoading(false);
     }
   };
 
@@ -103,11 +167,10 @@ const JobDetailPage = () => {
           <h2>Yêu cầu</h2>
           <ul>
             {job.jobLevel && <li><strong>Cấp bậc:</strong> {job.jobLevel}</li>}
-{job.jobEducation && <li><strong>Học vấn:</strong> {job.jobEducation}</li>}
+            {job.jobEducation && <li><strong>Học vấn:</strong> {job.jobEducation}</li>}
             {job.jobFromWork && <li><strong>Hình thức làm việc:</strong> {job.jobFromWork}</li>}
             {job.jobHireNumber && <li><strong>Số lượng tuyển:</strong> {job.jobHireNumber}</li>}
           </ul>
-          {/* Hiển thị thêm phần yêu cầu chi tiết nếu có */}
           {job.requirements && (
             Array.isArray(job.requirements) ? (
               <ul>
@@ -120,24 +183,34 @@ const JobDetailPage = () => {
         </div>
 
         <div className="job-actions">
-          {job.applicationUrl ? (
-            <a
-              href={job.applicationUrl}
-              className="apply-button"
-              target="_blank"
-              rel="noopener noreferrer"
-            >
-              Ứng tuyển ngay
-            </a>
-          ) : (
+          <div className="action-buttons">
+            {job.applicationUrl ? (
+              <a
+                href={job.applicationUrl}
+                className="apply-button"
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                Ứng tuyển ngay
+              </a>
+            ) : (
+              <button
+                className="apply-button"
+                onClick={handleApply}
+                disabled={applyLoading || applySuccess}
+              >
+                {applySuccess ? 'Đã ứng tuyển' : applyLoading ? 'Đang gửi...' : 'Ứng tuyển ngay'}
+              </button>
+            )}
+
             <button
-              className="apply-button"
-              onClick={handleApply}
-              disabled={applyLoading || applySuccess}
+              className={`save-button ${isSaved ? 'saved' : ''}`}
+              onClick={handleSaveJob}
+              disabled={saveLoading}
             >
-              {applySuccess ? 'Đã ứng tuyển' : applyLoading ? 'Đang gửi...' : 'Ứng tuyển ngay'}
+              {saveLoading ? 'Đang xử lý...' : isSaved ? 'Đã lưu' : 'Lưu công việc'}
             </button>
-          )}
+          </div>
         </div>
       </div>
     </div>
