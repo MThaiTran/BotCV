@@ -1,44 +1,55 @@
-// src/components/SavedJobCard/SavedJobCard.jsx
+// src/components/Job/SavedJobCard.jsx
 import React from 'react';
-import { Link } from 'react-router-dom';
 import PropTypes from 'prop-types';
+import { Link } from 'react-router-dom';
 import '../../assets/css/Components/SavedJobCard.css';
 
-const SavedJobCard = ({ job, onUnsave }) => {
+const SavedJobCard = ({
+  ID,
+  name,
+  jobExperience,
+  salaryRange,
+  expirationDate,
+  jobLevel,
+  jobEducation,
+  jobFromWork,
+  onUnsave,
+  isSaved
+}) => {
   return (
     <div className="saved-job-card">
-      <div className="card-header">
-        <h3 className="job-title">
-          <Link to={`/jobs/${job.id}`} className="job-title-link">
-            {job.title}
-          </Link>
-        </h3>
-        <span className="company">{job.company.name}</span>
+      <div className="job-card-header">
+        <h2 className="job-title">
+          <Link to={`/jobs/${ID}`}>{name}</Link>
+        </h2>
+        <span className="saved-badge">Đã lưu</span>
       </div>
-
-      <div className="card-details">
-        <div className="detail-item">
-          <span className="label">Địa điểm:</span>
-          <span className="value">{job.location}</span>
+      
+      <div className="job-card-body">
+        <div className="job-meta">
+          {salaryRange && <span className="salary">{salaryRange}</span>}
+          {jobFromWork && <span className="work-type">{jobFromWork}</span>}
+          {jobExperience && <span className="experience">{jobExperience}</span>}
         </div>
-        <div className="detail-item">
-          <span className="label">Mức lương:</span>
-          <span className="value">
-            {job.salary.min} - {job.salary.max} {job.salary.currency}
-          </span>
+        
+        <div className="job-tags">
+          {jobLevel && <span className="tag level">{jobLevel}</span>}
+          {jobEducation && <span className="tag education">{jobEducation}</span>}
         </div>
-        <div className="detail-item">
-          <span className="label">Loại hình:</span>
-          <span className="value">{job.type}</span>
-        </div>
+        
+        {expirationDate && (
+          <div className="job-date expiry">
+            Hết hạn: {new Date(expirationDate).toLocaleDateString('vi-VN')}
+          </div>
+        )}
       </div>
-
-      <div className="card-actions">
-        <button 
-          className="unsave-btn"
-          onClick={() => onUnsave(job.id)}
-        >
-          Hủy lưu
+      
+      <div className="job-card-footer">
+        <Link to={`/jobs/${ID}`} className="view-detail-btn">
+          Xem chi tiết
+        </Link>
+        <button className="unsave-btn" onClick={() => onUnsave(ID)}>
+          Bỏ lưu
         </button>
       </div>
     </div>
@@ -46,21 +57,16 @@ const SavedJobCard = ({ job, onUnsave }) => {
 };
 
 SavedJobCard.propTypes = {
-  job: PropTypes.shape({
-    id: PropTypes.string.isRequired,
-    title: PropTypes.string.isRequired,
-    company: PropTypes.shape({
-      name: PropTypes.string.isRequired
-    }).isRequired,
-    location: PropTypes.string.isRequired,
-    salary: PropTypes.shape({
-      min: PropTypes.number,
-      max: PropTypes.number,
-      currency: PropTypes.string
-    }),
-    type: PropTypes.string.isRequired
-  }).isRequired,
-  onUnsave: PropTypes.func.isRequired
+  ID: PropTypes.oneOfType([PropTypes.string, PropTypes.number]).isRequired,
+  name: PropTypes.string.isRequired,
+  jobExperience: PropTypes.string,
+  salaryRange: PropTypes.string,
+  expirationDate: PropTypes.string,
+  jobLevel: PropTypes.string,
+  jobEducation: PropTypes.string,
+  jobFromWork: PropTypes.string,
+  onUnsave: PropTypes.func.isRequired,
+  isSaved: PropTypes.bool
 };
 
 export default SavedJobCard;

@@ -47,16 +47,26 @@ const AdminUserManagementPage = () => {
 
       // Log dữ liệu thô để kiểm tra cấu trúc API
       console.log('Raw Users Data:', data);
+      // Log chi tiết một vài đối tượng đầu tiên
+      if (data && data.length > 0) {
+          console.log('First user data:', data[0]);
+          if (data.length > 1) console.log('Second user data:', data[1]);
+          if (data.length > 2) console.log('Third user data:', data[2]);
+      }
 
       // Ánh xạ dữ liệu từ cấu trúc API sang cấu trúc frontend mong muốn
       const mappedUsers = data.map(user => ({
         id: user.ID || user.id, // Ánh xạ ID từ API (hỗ trợ cả ID và id)
-        name: user.fullName || user.name || user.email || 'N/A', // Ánh xạ tên (ưu tiên fullName, sau đó name, cuối cùng email nếu không có tên nào)
-        email: user.email || 'N/A', // Ánh xạ email
+        // Sử dụng email làm tên hiển thị tạm thời nếu không có fullName/name
+        fullName: user.fullName || user.name || user.email || 'N/A', 
+        // Sử dụng email từ API cho trường emailContact
+        emailContact: user.email || 'N/A', 
+        email: user.email || 'N/A', // Giữ lại trường email gốc
         role: user.userType === 'Employer' ? 'employer' : 'candidate', // Ánh xạ userType sang role
-        createdAt: user.registrationDate || user.createdAt || 'N/A', // Ánh xạ ngày đăng ký (hỗ trợ registrationDate và createdAt)
-        status: user.status || 'unknown', // Ánh xạ trạng thái (mặc định 'unknown' nếu không có)
-        // Giữ lại các thuộc tính khác nếu có và cần dùng
+        registrationDate: user.registrationDate || user.createdAt || 'N/A', // Ánh xạ ngày đăng ký
+        // Status không có trong API log, giữ nguyên logic fallback
+        status: user.status || 'unknown', 
+        // Giữ lại các thuộc tính khác
         ...user
       }));
 
@@ -287,7 +297,6 @@ const AdminUserManagementPage = () => {
                 <th>Email</th>
                 <th>Loại tài khoản</th>
                 <th>Ngày đăng ký</th>
-                <th>Trạng thái</th>
                 <th>Thao tác</th>
               </tr>
             </thead>
@@ -295,19 +304,16 @@ const AdminUserManagementPage = () => {
               {filteredUsers.map(user => (
                 <tr key={user.ID}>
                   <td>{user.ID}</td>
-                  <td>{user.fullName}</td>
-                  <td>{user.emailContact}</td>
+                  {/* Hiển thị email trong cột Email */}
+                  <td>{user.email}</td>
+                  {/* Cột Loại tài khoản */}
                   <td>
                     <span className={`role-badge ${user.role}`}>
                       {user.role === 'employer' ? 'Nhà tuyển dụng' : 'Ứng viên'}
                     </span>
                   </td>
+                  {/* Cột Ngày đăng ký */}
                   <td>{user.registrationDate ? new Date(user.registrationDate).toLocaleDateString() : ''}</td>
-                  <td>
-                    <span className={`status-badge ${user.status}`}>
-                      {user.status === 'active' ? 'Đang hoạt động' : 'Đã khóa'}
-                    </span>
-                  </td>
                   <td className="action-buttons">
                     <button
                       className="edit-btn"

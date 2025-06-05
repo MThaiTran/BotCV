@@ -1,4 +1,4 @@
-// src/components/Job/JobCard.jsx
+// src/components/Job/JobCard.jsx (giữ nguyên cho trang tìm kiếm)
 import React from 'react';
 import PropTypes from 'prop-types';
 import { Link } from 'react-router-dom';
@@ -15,10 +15,7 @@ const JobCard = ({
   jobFromWork,
   company,
   location,
-  postedAt,
-  tags,
-  isSaved,
-  onUnsave
+  postedAt
 }) => {
   return (
     <div className="job-card">
@@ -28,35 +25,30 @@ const JobCard = ({
         </h2>
         {company && <span className="company">{company}</span>}
       </div>
+      
       <div className="job-card-body">
         <div className="job-meta">
-          {location && <span>{location}</span>}
-          {salaryRange && <span>{salaryRange}</span>}
-          {jobFromWork && <span>{jobFromWork}</span>}
-          {jobExperience && <span>{jobExperience} kinh nghiệm</span>}
+          {location && <span className="location">{location}</span>}
+          {salaryRange && <span className="salary">{salaryRange}</span>}
+          {jobFromWork && <span className="work-type">{jobFromWork}</span>}
+          {jobExperience && <span className="experience">{jobExperience}</span>}
         </div>
+        
         <div className="job-tags">
-          {jobLevel && <span className="tag">{jobLevel}</span>}
-          {jobEducation && <span className="tag">{jobEducation}</span>}
-          {Array.isArray(tags) && tags.map((tag, idx) => (
-            <span className="tag" key={idx}>{tag}</span>
-          ))}
+          {jobLevel && <span className="tag level">{jobLevel}</span>}
+          {jobEducation && <span className="tag education">{jobEducation}</span>}
         </div>
-        {expirationDate && (
-          <div className="job-date">
-            Hết hạn {new Date(expirationDate).toLocaleDateString('vi-VN')}
-          </div>
-        )}
-        {postedAt && (
-          <div className="job-date">
-            Đăng ngày {new Date(postedAt).toLocaleDateString('vi-VN')}
-          </div>
-        )}
-        <div className="job-card-footer">
-          {isSaved && typeof onUnsave === 'function' && (
-            <button className="unsave-btn" onClick={onUnsave}>
-              Bỏ lưu
-            </button>
+        
+        <div className="job-dates">
+          {postedAt && (
+            <div className="job-date posted">
+              Đăng: {new Date(postedAt).toLocaleDateString('vi-VN')}
+            </div>
+          )}
+          {expirationDate && (
+            <div className="job-date expiry">
+              Hết hạn: {new Date(expirationDate).toLocaleDateString('vi-VN')}
+            </div>
           )}
         </div>
       </div>
@@ -75,10 +67,7 @@ JobCard.propTypes = {
   jobFromWork: PropTypes.string,
   company: PropTypes.string,
   location: PropTypes.string,
-  postedAt: PropTypes.string,
-  tags: PropTypes.arrayOf(PropTypes.string),
-  isSaved: PropTypes.bool,
-  onUnsave: PropTypes.func
+  postedAt: PropTypes.string
 };
 
 export default JobCard;
