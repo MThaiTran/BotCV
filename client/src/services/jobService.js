@@ -84,9 +84,10 @@ const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000/api';
 
 export const jobService = {
   // Hàm tìm kiếm công việc
-  searchJobs: async (filters) => {
+  searchJobs: async (filters = {}) => {
     try {
-      const response = await axios.get(`${API_URL}/job`, { params: filters });
+      // Chỉ gọi API lấy tất cả jobs, không gửi filters
+      const response = await axios.get(`${API_URL}/job`);
       return response.data.data;
     } catch (error) {
       console.error('Error searching jobs:', error);
