@@ -107,7 +107,7 @@ const Header = () => {
                         {currentUser?.userAcc.userType === 'Seeker' && (
                           <>
                             <li>
-                              <Link to={`/profile/${currentUser.id}`}>
+                              <Link to={`/profile/${currentUser.ID}`}>
                                 <i className="icon-profile"></i>
                                 Thông tin tài khoản
                               </Link>

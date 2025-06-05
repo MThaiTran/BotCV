@@ -160,7 +160,7 @@ const JobDetailPage = () => {
 
         <div className="job-section">
           <h2>Mô tả công việc</h2>
-          <div dangerouslySetInnerHTML={{ __html: job.description }} />
+          <div dangerouslySetInnerHTML={{ __html: job.jobDescription }} />
         </div>
 
         <div className="job-section">

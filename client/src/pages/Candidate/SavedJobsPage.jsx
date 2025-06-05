@@ -49,8 +49,20 @@ const SavedJobsPage = () => {
         const filtered = response.data.data.filter(
           (app) => app.SeekerProfileID === seekerProfileId
         );
-        setSavedJobs(filtered);
-        console.log('Saved jobs fetched:', filtered);
+        
+        // Fetch job details for each filtered item
+        const jobsWithDetails = await Promise.all(
+          filtered.map(async (item) => {
+            const jobResponse = await axios.get(`/api/job/${item.JobID}`);
+            return {
+              ...item,
+              ...jobResponse.data
+            };
+          })
+        );
+        
+        setSavedJobs(jobsWithDetails);
+        console.log('Saved jobs with details:', jobsWithDetails);
       } catch (error) {
         console.error('Lỗi tải việc lưu', error);
       }

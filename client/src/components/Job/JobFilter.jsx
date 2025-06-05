@@ -41,14 +41,14 @@ const JobFilter = ({ filters, onFilterChange }) => {
       </div>
 
       <div className="filter-group">
-        <label htmlFor="location">Địa điểm</label>
+        <label htmlFor="jobLevel">Trình độ</label>
         <input
           type="text"
-          id="location"
-          name="location"
-          value={filters.location || ''}
+          id="jobLevel"
+          name="jobLevel"
+          value={filters.jobLevel || ''}
           onChange={handleInputChange}
-          placeholder="Nhập địa điểm..."
+          placeholder="Nhập trình độ..."
         />
       </div>
 
@@ -76,7 +76,7 @@ const JobFilter = ({ filters, onFilterChange }) => {
 JobFilter.propTypes = {
   filters: PropTypes.shape({
     keyword: PropTypes.string,
-    location: PropTypes.string,
+    jobLevel: PropTypes.string,
     types: PropTypes.arrayOf(PropTypes.string)
   }).isRequired,
   onFilterChange: PropTypes.func.isRequired

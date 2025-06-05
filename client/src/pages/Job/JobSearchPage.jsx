@@ -6,38 +6,55 @@ import '../../assets/css/Pages/Job/JobSearchPage.css';
 
 const JobSearchPage = () => {
   const [isLoading, setIsLoading] = useState(false); 
-  const [jobs, setJobs] = useState([]);
+  const [allJobs, setAllJobs] = useState([]);
+  const [filteredJobs, setFilteredJobs] = useState([]);
   const [filters, setFilters] = useState({
     keyword: '',
-    location: '',
+    jobLevel: '',
     types: []
   });
 
+  // Fetch all jobs once when component mounts
   useEffect(() => {
-    const fetchJobs = async () => {
+    const fetchAllJobs = async () => {
       setIsLoading(true);
       try {
-        const data = await jobService.searchJobs(filters);
-        setJobs(data);
+        const data = await jobService.searchJobs({ jobLevel: filters.jobLevel, types: filters.types });
+        setAllJobs(data);
+        setFilteredJobs(data);
       } catch (error) {
         console.error('Error fetching jobs:', error);
       } finally {
         setIsLoading(false);
       }
     };
-    const debounceTimer = setTimeout(fetchJobs, 500);
-    return () => clearTimeout(debounceTimer);
-  }, [filters]);
+    fetchAllJobs();
+  }, [filters.jobLevel, filters.types]);
+
+  // Filter jobs by keyword on client side
+  useEffect(() => {
+    if (filters.keyword.trim() === '') {
+      setFilteredJobs(allJobs);
+    } else {
+      const keyword = filters.keyword.toLowerCase();
+      const filtered = allJobs.filter(job => 
+        job.name.toLowerCase().includes(keyword) ||
+        job.company?.toLowerCase().includes(keyword) ||
+        job.description?.toLowerCase().includes(keyword)
+      );
+      setFilteredJobs(filtered);
+    }
+  }, [filters.keyword, allJobs]);
 
   return (
     <div className="job-search-page">
       <h1>Tìm kiếm việc làm</h1>
       <JobFilter filters={filters} onFilterChange={setFilters} />
-      {console.log('Current jobs:', jobs)}
+      {console.log('Current jobs:', filteredJobs)}
       {isLoading ? (
         <p>Đang tải kết quả...</p>
       ) : (
-        <JobList jobs={jobs} />
+        <JobList jobs={filteredJobs} />
       )}
     </div>
   );
